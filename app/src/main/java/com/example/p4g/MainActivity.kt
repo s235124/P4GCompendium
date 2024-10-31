@@ -1,7 +1,6 @@
 package com.example.p4g
 
 import android.os.Bundle
-import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,44 +13,29 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -68,16 +52,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -139,7 +118,7 @@ fun ListCard(listitem: Listitem, modifier: Modifier = Modifier) {
                 Image(
                     painter = painterResource(listitem.img),
                     contentDescription = stringResource(listitem.name),
-                    modifier = Modifier
+                    modifier = Modifier.padding(10.dp)
                         .fillMaxSize()
                         .clip(shape = TriangleShape()), // Ensure the image fits the angled shape
                     contentScale = ContentScale.FillWidth
@@ -186,7 +165,7 @@ private fun ListCardPreview() {
 }
 
 @Composable
-fun ListItemList(modifier: Modifier = Modifier) {
+fun ListItemList(modifier: Modifier = Modifier, searchQuery: String) {
 
     val listItemList = List(10) {
         Listitem(R.string.v, R.drawable.i_prc0b0_tmx_1) // Replace with your actual resources
@@ -201,8 +180,12 @@ fun ListItemList(modifier: Modifier = Modifier) {
         Listitem(R.string.v, R.drawable.i_prc0b0_tmx_1)
     }
 
+    val filtered = listItemList.filter {
+        LocalContext.current.getString(it.name).contains(searchQuery, ignoreCase = true)
+    }
+
     LazyColumn(modifier = modifier) {
-        items(listItemList) { listItem ->
+        items(filtered) { listItem ->
             ListCard(
                 listitem = listItem,
                 modifier = Modifier.padding(8.dp)
@@ -211,27 +194,11 @@ fun ListItemList(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun list() {
-    val layoutDirection = LocalLayoutDirection.current
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(
-                start = WindowInsets.safeDrawing.asPaddingValues().calculateStartPadding(layoutDirection),
-                end = WindowInsets.safeDrawing.asPaddingValues().calculateEndPadding(layoutDirection),
-            ),
-    ) {
-        ListItemList()
-    }
-}
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
+fun SearchBar(modifier: Modifier = Modifier, onSearchTextChange: (String) -> Unit, searchText: String) {
 
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
 
     Box(
         modifier = modifier
@@ -257,10 +224,7 @@ fun SearchBar(modifier: Modifier = Modifier) {
 
             TextField(
                 value = searchText,  // Bind TextField to state
-                onValueChange = { newText ->
-                    searchText = newText  // Update state when the user types
-                    // Optionally, trigger search logic here
-                },
+                onValueChange = onSearchTextChange,
                 placeholder = {
                     Text(
                         text = "Search", color = Color.DarkGray
@@ -289,6 +253,7 @@ fun SearchBar(modifier: Modifier = Modifier) {
 
 @Composable
 fun BottomAppBarExample() {
+    var searchText by remember { mutableStateOf("") }
     Column(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues())) {
         Scaffold(
             topBar = {
@@ -298,7 +263,12 @@ fun BottomAppBarExample() {
                         .padding(top = 10.dp),  // Add padding to avoid the status bar
                     horizontalArrangement = Arrangement.Center // Center the SearchBar horizontally
                 ) {
-                    SearchBar()  // This SearchBar is now centered
+                    SearchBar(
+                        searchText = searchText,
+                        onSearchTextChange = {
+                            newText -> searchText = newText
+                        }
+                    )  // This SearchBar is now centered
                 }
             },
             bottomBar = {
@@ -349,7 +319,7 @@ fun BottomAppBarExample() {
                         .padding(10.dp)
 
                 ) {
-                    ListItemList()
+                    ListItemList(searchQuery = searchText)
                 }
             }
         )
