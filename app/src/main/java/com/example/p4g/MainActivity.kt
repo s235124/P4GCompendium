@@ -121,6 +121,74 @@ fun MainPage (modifier: Modifier = Modifier
     BottomAppBarExample()
 }
 
+@Composable
+fun BottomAppBarExample() {
+    Column(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues())) {
+        Scaffold(
+            topBar = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),  // Add padding to avoid the status bar
+                    horizontalArrangement = Arrangement.Center // Center the SearchBar horizontally
+                ) {
+                    SearchBar()  // This SearchBar is now centered
+                }
+            },
+            bottomBar = {
+                BottomAppBar {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = { /* do something */ },
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.Home,
+                                contentDescription = "Localized description",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(
+                            onClick = { /* do something */ },
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.Favorite,
+                                contentDescription = "Localized description",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(
+                            onClick = { /* do something */ },
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.Settings,
+                                contentDescription = "Localized description",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            content = { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(10.dp)
+
+                ) {
+                    ListItemList()
+                }
+            }
+        )
+    }
+}
 
 @Composable
 fun ListCard(listitem: Listitem, modifier: Modifier = Modifier) {
@@ -160,7 +228,6 @@ fun ListCard(listitem: Listitem, modifier: Modifier = Modifier) {
     }
 }
 
-// Custom shape for the angled cut
 class TriangleShape : Shape {
     override fun createOutline(
         size: Size,
@@ -177,7 +244,6 @@ class TriangleShape : Shape {
         return Outline.Generic(path)
     }
 }
-
 
 @Preview
 @Composable
@@ -284,74 +350,5 @@ fun SearchBar(modifier: Modifier = Modifier) {
             )
 
         }
-    }
-}
-
-@Composable
-fun BottomAppBarExample() {
-    Column(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues())) {
-        Scaffold(
-            topBar = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),  // Add padding to avoid the status bar
-                    horizontalArrangement = Arrangement.Center // Center the SearchBar horizontally
-                ) {
-                    SearchBar()  // This SearchBar is now centered
-                }
-            },
-            bottomBar = {
-                BottomAppBar {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = { /* do something */ },
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        ) {
-                            Icon(
-                                Icons.Filled.Home,
-                                contentDescription = "Localized description",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        IconButton(
-                            onClick = { /* do something */ },
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        ) {
-                            Icon(
-                                Icons.Filled.Favorite,
-                                contentDescription = "Localized description",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        IconButton(
-                            onClick = { /* do something */ },
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        ) {
-                            Icon(
-                                Icons.Filled.Settings,
-                                contentDescription = "Localized description",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                    }
-                }
-            },
-            content = { innerPadding ->
-                Column(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(10.dp)
-
-                ) {
-                    ListItemList()
-                }
-            }
-        )
     }
 }
