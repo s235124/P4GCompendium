@@ -1,7 +1,6 @@
 package com.example.p4g.HTTP
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.p4g.Entity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

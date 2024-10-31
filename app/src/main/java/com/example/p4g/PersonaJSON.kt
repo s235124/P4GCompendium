@@ -14,19 +14,24 @@ data class Entity(
     val stats: List<Int>
 )
 
-fun main() : Unit = runBlocking {
+class PersonaJSON {
+    public fun makeList() : ArrayList<Map.Entry<String, Entity>> = runBlocking {
 
-    val personaViewModel = PersonaViewModel()
+        val personaViewModel = PersonaViewModel()
 
-    // Deserialize the JSON into a map
-    val entityMap = personaViewModel.personas.value
+        var personaList = arrayListOf<Map.Entry<String, Entity>>()
 
-    // Iterate through the map to get the names of each persona
-    personaViewModel.personas.collect { entityMap ->
-        if (entityMap != null) {
-            for (name in entityMap.values) {
-                println(name) // Prints the name of each persona
+        val entityMap = personaViewModel.personas.value
+
+        // Iterate through the map to get the names of each persona
+        personaViewModel.personas.collect { entityMap ->
+            if (entityMap != null) {
+                for (persona in entityMap) {
+                    personaList.add(persona)
+                }
             }
         }
+
+        return@runBlocking personaList
     }
 }
