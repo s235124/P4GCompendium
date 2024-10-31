@@ -85,14 +85,7 @@ import androidx.compose.ui.unit.dp
 import com.example.p4g.listItems.Listitem
 import com.example.p4g.ui.theme.P4GTheme
 
-private data class Persona (
-    val id: Int,
-    val name: String,
-    val level: Int,
-    val arcana: String,
-    val primaryElement: String,
-    val elements: MutableList<String>
-)
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
