@@ -1,5 +1,6 @@
 package com.example.p4g
 
+import android.util.Log
 import com.example.p4g.HTTP.PersonaViewModel
 import kotlinx.serialization.Serializable
 
@@ -9,7 +10,7 @@ data class Entity(
     val lvl: Int,
     val race: String,
     val resists: String,
-    val skills: ArrayList<Skills>,
+    val skills: Map<String, Double>,
     val stats: List<Int>
 )
 
@@ -27,32 +28,33 @@ data class Entity(
 
 class PersonaJSON {
     companion object {
-        fun makeList(): ArrayList<Persona> {
-
-            val personaViewModel = PersonaViewModel()
-
+        fun makeList(personaViewModel: PersonaViewModel): ArrayList<Persona> {
             val personaList = arrayListOf<Persona>()
 
+            // Ensure personas are loaded
+            personaViewModel.personas.value?.let { personas ->
+                // Iterate through the map
+                personas.forEach { persona ->
+                    val p = Persona(
+                        persona.key,
+                        persona.value.inherits,
+                        persona.value.lvl,
+                        persona.value.race,
+                        persona.value.resists
+                    )
 
-            // Iterate through the map
-            personaViewModel.personas.value?.forEach { persona ->
-                val p= Persona(
-                    persona.key,
-                    persona.value.inherits,
-                    persona.value.lvl,
-                    persona.value.race,
-                    persona.value.resists
-                )
+                    for (skill in persona.value.skills) {
+                        p.skills.add(Skills(skill.key, skill.value))
+                    }
 
-                for (skill in persona.value.skills) {
-                    p.skills.add(Skills(skill.skillName, skill.gainedAtLevel))
+                    for (stat in persona.value.stats) {
+                        p.stats.add(stat)
+                    }
+
+                    personaList.add(p)
                 }
-
-                for (stat in persona.value.stats) {
-                    p.stats.add(stat)
-                }
-
-                personaList.add(p)
+            } ?: run {
+                Log.e("PersonaJSON", "No personas available.")
             }
 
             return personaList
