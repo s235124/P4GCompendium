@@ -1,9 +1,8 @@
 package com.example.p4g.HTTP
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.p4g.Entity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,7 +16,8 @@ class PersonaViewModel : ViewModel() {
     }
 
     private fun fetchPersonas() {
-        CoroutineScope(Dispatchers.IO).launch {
+
+        viewModelScope.launch {
             try {
                 _personas.value = RetrofitInstance.api.getPersonas()
             }

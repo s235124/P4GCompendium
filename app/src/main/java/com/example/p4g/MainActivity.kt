@@ -1,6 +1,5 @@
 package com.example.p4g
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -60,19 +59,14 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.example.p4g.PersonaJSON
-import com.example.p4g.HTTP.PersonaViewModel
 import com.example.p4g.listItems.ListItem
-import com.example.p4g.listItems.Listitem
 import com.example.p4g.ui.theme.P4GTheme
 
 
@@ -230,23 +224,19 @@ class TriangleShape : Shape {
 @Preview
 @Composable
 private fun ListCardPreview() {
-//    ListCard(Listitem(R.string.v,R.drawable.i_prc0b0_tmx_1))
+//    ListCard(ListItem("R.string.v",R.drawable.i_prc0b0_tmx_1))
 }
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ListItemList(modifier: Modifier = Modifier) {
 
-    val personaViewModel = PersonaViewModel()
-
-    var listItemList: ArrayList<Map<String, Entity>?> = arrayListOf()
-
-    listItemList.add(personaViewModel.personas.value)
+    val personaList = PersonaJSON.makeList()
 
     LazyColumn(modifier = modifier) {
-        items(listItemList) { listItem ->
+        items(personaList) { listItem ->
+            val lItem = ListItem(listItem.name, R.drawable.i_prc0b0_tmx_1)
             ListCard(
-                listitem = listItem,
+                listitem = lItem,
                 modifier = Modifier.padding(8.dp)
             )
         }

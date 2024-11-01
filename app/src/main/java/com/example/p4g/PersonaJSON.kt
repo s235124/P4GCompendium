@@ -1,7 +1,6 @@
 package com.example.p4g
 
 import com.example.p4g.HTTP.PersonaViewModel
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,28 +9,53 @@ data class Entity(
     val lvl: Int,
     val race: String,
     val resists: String,
-    val skills: Map<String, Double>,
+    val skills: ArrayList<Skills>,
     val stats: List<Int>
 )
 
+//fun main () {
+//    println("Making list")
+//    var i = 0
+//    val p = PersonaJSON.makeList()
+//    for (persona in p) {
+//        i++
+//        println("Persona number $i\n")
+//        println(persona.name)
+//    }
+//    println("list is done")
+//}
+
 class PersonaJSON {
-    public fun makeList() : ArrayList<Map.Entry<String, Entity>> = runBlocking {
+    companion object {
+        fun makeList(): ArrayList<Persona> {
 
-        val personaViewModel = PersonaViewModel()
+            val personaViewModel = PersonaViewModel()
 
-        var personaList = arrayListOf<Map.Entry<String, Entity>>()
+            val personaList = arrayListOf<Persona>()
 
-        val entityMap = personaViewModel.personas.value
 
-        // Iterate through the map to get the names of each persona
-        personaViewModel.personas.collect { entityMap ->
-            if (entityMap != null) {
-                for (persona in entityMap) {
-                    personaList.add(persona)
+            // Iterate through the map
+            personaViewModel.personas.value?.forEach { persona ->
+                val p= Persona(
+                    persona.key,
+                    persona.value.inherits,
+                    persona.value.lvl,
+                    persona.value.race,
+                    persona.value.resists
+                )
+
+                for (skill in persona.value.skills) {
+                    p.skills.add(Skills(skill.skillName, skill.gainedAtLevel))
                 }
-            }
-        }
 
-        return@runBlocking personaList
+                for (stat in persona.value.stats) {
+                    p.stats.add(stat)
+                }
+
+                personaList.add(p)
+            }
+
+            return personaList
+        }
     }
 }
