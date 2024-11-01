@@ -129,6 +129,23 @@ fun BottomAppBarExample() {
     }
 }
 
+class TriangleShape : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val path = Path().apply {
+            moveTo(0f, 0f)
+            lineTo(size.width, 0f)
+            lineTo(size.width, size.height)
+            lineTo(0f, size.height)
+            close()
+        }
+        return Outline.Generic(path)
+    }
+}
+
 @Composable
 fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
     // Calculate % of screen height
@@ -190,23 +207,6 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
     }
 }
 
-class TriangleShape : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        val path = Path().apply {
-            moveTo(0f, 0f)
-            lineTo(size.width, 0f)
-            lineTo(size.width, size.height)
-            lineTo(0f, size.height)
-            close()
-        }
-        return Outline.Generic(path)
-    }
-}
-
 @Preview
 @Composable
 private fun ListCardPreview() {
@@ -246,10 +246,11 @@ fun fetchList (modifier: Modifier, personaViewModel: PersonaViewModel): List<Per
 @Composable
 fun ListItemList(modifier: Modifier = Modifier, originalList: List<Persona>) {
     var filteredList by remember { mutableStateOf(originalList) }
-    var isLoading by remember { mutableStateOf(false) }
-
-    // Create a search text state
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
+
+    LaunchedEffect(originalList) { // Ensures the list is shown only when data has been fetched
+        filteredList = originalList
+    }
 
     // Function to filter the list based on the search text
     fun filterList(query: String) {
@@ -257,12 +258,12 @@ fun ListItemList(modifier: Modifier = Modifier, originalList: List<Persona>) {
             originalList // Show all if the search query is empty
         } else {
             originalList.filter { persona ->
-                persona.name.contains(query, ignoreCase = true) // Adjust based on your data structure
+                persona.name.contains(query, ignoreCase = true) // Filter the list
             }
         }
     }
 
-    filterList("") // Run once, otherwise empty list shows up
+//    filterList("") // Run once, otherwise empty list shows up
 
     Column {
         // Search bar
@@ -275,18 +276,14 @@ fun ListItemList(modifier: Modifier = Modifier, originalList: List<Persona>) {
             }
         )
 
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-        } else {
-            LazyColumn(modifier = modifier) {
-                items(filteredList) { listItem ->
-                    Log.d("ListItemList", "Rendering item: ${listItem.name}")
-                    val lItem = ListItem(listItem.name, R.drawable.i_prc0b0_tmx_1, listItem.level, listItem.race)
-                    ListCard(
-                        listitem = lItem,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
+        LazyColumn(modifier = modifier) {
+            items(filteredList) { listItem ->
+                Log.d("ListItemList", "Rendering item: ${listItem.name}")
+                val lItem = ListItem(listItem.name, R.drawable.i_prc0b0_tmx_1, listItem.level, listItem.race)
+                ListCard(
+                    listitem = lItem,
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
     }
