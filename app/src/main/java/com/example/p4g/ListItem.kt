@@ -5,5 +5,7 @@ import androidx.annotation.DrawableRes
 
 data class ListItem(
     val name: String,
-    @DrawableRes val img: Int
+    @DrawableRes val img: Int,
+    val level : Int,
+    val race : String
 )

@@ -100,7 +100,6 @@ fun MainPage (modifier: Modifier = Modifier
 
 @Composable
 fun BottomAppBarExample() {
-
     Column(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues())) {
         Scaffold(
             topBar = {
@@ -110,7 +109,7 @@ fun BottomAppBarExample() {
                         .padding(top = 10.dp),  // Add padding to avoid the status bar
                     horizontalArrangement = Arrangement.Center // Center the SearchBar horizontally
                 ) {
-                    SearchBar()  // This SearchBar is now centered
+//                    SearchBar()  // This SearchBar is now centered
                 }
             },
             bottomBar = { BottomBar(modifier = Modifier.fillMaxWidth()) },
@@ -121,7 +120,9 @@ fun BottomAppBarExample() {
                         .padding(10.dp)
 
                 ) {
-                    ListItemList(personaViewModel = PersonaViewModel())
+                    val pvm = PersonaViewModel()
+                    val originalList = fetchList(modifier = Modifier, personaViewModel = pvm)
+                    ListItemList(modifier = Modifier, originalList = originalList)
                 }
             }
         )
@@ -162,6 +163,29 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
+            Column(
+                modifier = Modifier
+                    .weight(0.6f) // Adjust the weight for the text
+                    .padding(16.dp)
+                    .fillMaxHeight()
+            ) {
+                Text(
+                    text = listitem.level.toString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .weight(0.6f) // Adjust the weight for the text
+                    .padding(16.dp)
+                    .fillMaxHeight()
+            ) {
+                Text(
+                    text = listitem.race,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
         }
     }
 }
@@ -188,9 +212,8 @@ class TriangleShape : Shape {
 private fun ListCardPreview() {
 //    ListCard(ListItem("R.string.v",R.drawable.i_prc0b0_tmx_1))
 }
-
 @Composable
-fun ListItemList(modifier: Modifier = Modifier, personaViewModel: PersonaViewModel) {
+fun fetchList (modifier: Modifier, personaViewModel: PersonaViewModel): List<Persona> {
     var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
@@ -212,13 +235,53 @@ fun ListItemList(modifier: Modifier = Modifier, personaViewModel: PersonaViewMod
     if (isLoading) {
         CircularProgressIndicator(modifier = Modifier.padding(16.dp))
     } else {
-        if (personaList.isEmpty()) {
-            Text("No items available", modifier = Modifier.padding(16.dp))
+        if (personaList.isNotEmpty()) {
+            return personaList
+        }
+    }
+
+    return emptyList()
+}
+
+@Composable
+fun ListItemList(modifier: Modifier = Modifier, originalList: List<Persona>) {
+    var filteredList by remember { mutableStateOf(originalList) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    // Create a search text state
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+
+    // Function to filter the list based on the search text
+    fun filterList(query: String) {
+        filteredList = if (query.isBlank()) {
+            originalList // Show all if the search query is empty
+        } else {
+            originalList.filter { persona ->
+                persona.name.contains(query, ignoreCase = true) // Adjust based on your data structure
+            }
+        }
+    }
+
+    filterList("") // Run once, otherwise empty list shows up
+
+    Column {
+        // Search bar
+        SearchBar(
+            modifier = Modifier.padding(16.dp),
+            searchText = searchText,
+            onSearchTextChange = { newText ->
+                searchText = newText
+                filterList(newText.text) // Filter the list on text change
+            }
+        )
+
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
         } else {
             LazyColumn(modifier = modifier) {
-                items(personaList) { listItem ->
-                    Log.d("ListItemList", "Rendering item: ${listItem.name}") // Log each item being rendered
-                    val lItem = ListItem(listItem.name, R.drawable.i_prc0b0_tmx_1)
+                items(filteredList) { listItem ->
+                    Log.d("ListItemList", "Rendering item: ${listItem.name}")
+                    val lItem = ListItem(listItem.name, R.drawable.i_prc0b0_tmx_1, listItem.level, listItem.race)
                     ListCard(
                         listitem = lItem,
                         modifier = Modifier.padding(8.dp)
@@ -290,10 +353,11 @@ fun BottomBar (modifier: Modifier) {
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
-
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
-
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    searchText: TextFieldValue,
+    onSearchTextChange: (TextFieldValue) -> Unit
+) {
     Box(
         modifier = modifier
             .width(360.dp)
@@ -301,7 +365,6 @@ fun SearchBar(modifier: Modifier = Modifier) {
             .height(50.dp)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart
-
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -317,33 +380,26 @@ fun SearchBar(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(8.dp))
 
             TextField(
-                value = searchText,  // Bind TextField to state
+                value = searchText,
                 onValueChange = { newText ->
-                    searchText = newText  // Update state when the user types
-                    // Optionally, trigger search logic here
+                    onSearchTextChange(newText) // Call the passed function to handle text changes
                 },
                 placeholder = {
-                    Text(
-                        text = "Search", color = Color.DarkGray
-                    )
+                    Text(text = "Search", color = Color.DarkGray)
                 },
-                //singleLine = true,
+                singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,             // Text color when focused
-                    unfocusedTextColor = Color.Black,           // Text color when not focused
-                    focusedPlaceholderColor = Color.DarkGray,       // Placeholder when focused
-                    unfocusedPlaceholderColor = Color.DarkGray,     // Placeholder when not focused
-                    focusedContainerColor = Color.Transparent,  // Transparent background
-                    unfocusedContainerColor = Color.Transparent, // Transparent background
-                    cursorColor = Color.Black,                  // Black cursor
-                    focusedIndicatorColor = Color.Transparent,   // Remove underline when focused
-                    unfocusedIndicatorColor = Color.Transparent  // Remove underline when not focused
-
-
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedPlaceholderColor = Color.DarkGray,
+                    unfocusedPlaceholderColor = Color.DarkGray,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    cursorColor = Color.Black,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
-
             )
-
         }
     }
 }
