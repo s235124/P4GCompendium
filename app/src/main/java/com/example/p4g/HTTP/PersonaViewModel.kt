@@ -19,7 +19,7 @@ class PersonaViewModel : ViewModel() {
 
     private fun fetchPersonas() {
         println("Fetching")
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 println("Trying")
                 _personas.value = RetrofitInstance.api.getPersonas()

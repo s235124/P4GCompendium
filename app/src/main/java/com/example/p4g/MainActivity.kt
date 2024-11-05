@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -153,11 +156,15 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
     val cardHeight = screenHeight * 0.1f
 
     Card(modifier = modifier.height(cardHeight)) {
-        Row {
+        Row (modifier = Modifier.clickable(
+                onClick = { /* go to specific personas page */ },
+                indication = rememberRipple(bounded = true), // Ripple effect for feedback
+                interactionSource = remember { MutableInteractionSource() }
+                )) {
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .weight(0.4f) // Adjust the weight as needed for the image
+                    .weight(0.3f) // Adjust the weight as needed for the image
                     .clip(shape = TriangleShape()) // Use a custom shape for the angled cut
             ) {
                 Image(
@@ -182,7 +189,7 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
             }
             Column(
                 modifier = Modifier
-                    .weight(0.6f) // Adjust the weight for the text
+                    .weight(0.3f) // Adjust the weight for the text
                     .padding(16.dp)
                     .fillMaxHeight()
             ) {
@@ -202,7 +209,6 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
-
         }
     }
 }
@@ -221,7 +227,7 @@ fun fetchList (modifier: Modifier, personaViewModel: PersonaViewModel): List<Per
         withContext(Dispatchers.IO) {
             try {
                 Log.d("ListItemList", "Fetching data...")
-                delay(2000) // Simulate network delay for testing
+                delay(5000) // Simulate network delay for testing
                 personaList = PersonaJSON.makeList(personaViewModel) // Pass the ViewModel
                 Log.d("ListItemList", "Data fetched: ${personaList.size} items") // Log the size of the list
             } catch (e: Exception) {
@@ -263,8 +269,6 @@ fun ListItemList(modifier: Modifier = Modifier, originalList: List<Persona>) {
         }
     }
 
-//    filterList("") // Run once, otherwise empty list shows up
-
     Column {
         // Search bar
         SearchBar(
@@ -288,23 +292,6 @@ fun ListItemList(modifier: Modifier = Modifier, originalList: List<Persona>) {
         }
     }
 }
-
-//@Composable
-//fun list() {
-//    val layoutDirection = LocalLayoutDirection.current
-//
-//    Surface(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .statusBarsPadding()
-//            .padding(
-//                start = WindowInsets.safeDrawing.asPaddingValues().calculateStartPadding(layoutDirection),
-//                end = WindowInsets.safeDrawing.asPaddingValues().calculateEndPadding(layoutDirection),
-//            ),
-//    ) {
-//        ListItemList()
-//    }
-//}
 
 @Composable
 fun BottomBar (modifier: Modifier) {
