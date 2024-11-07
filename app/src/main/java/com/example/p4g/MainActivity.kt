@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -93,26 +92,52 @@ fun P4GCompendiumApp () {
 }
 
 @Composable
-fun MainPage (modifier: Modifier = Modifier
-    .fillMaxSize()
-    .wrapContentSize()
-    .height(20.dp)
-) {
-    BottomAppBarExample()
+fun MainPage(modifier: Modifier = Modifier) {
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Fetch persona list
+    val originalList = fetchList(modifier = Modifier, personaViewModel = PersonaViewModel())
+
+    // Once fetched, update the persona list and set loading to false
+    LaunchedEffect(originalList) {
+        if (originalList.isNotEmpty()) {
+            personaList = originalList
+            isLoading = false
+        }
+    }
+
+    // Filtering logic
+    val filteredList = personaList.filter {
+        it.name.contains(searchText.text, ignoreCase = true)
+    }
+
+    BottomAppBarExample(
+        searchText = searchText,
+        onSearchTextChange = { newText -> searchText = newText },
+        filteredList = filteredList,
+        isLoading = isLoading
+    )
 }
 
 @Composable
-fun BottomAppBarExample() {
+fun BottomAppBarExample(
+    searchText: TextFieldValue,
+    onSearchTextChange: (TextFieldValue) -> Unit,
+    filteredList: List<Persona>,
+    isLoading: Boolean
+) {
     Column(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues())) {
         Scaffold(
             topBar = {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp),  // Add padding to avoid the status bar
-                    horizontalArrangement = Arrangement.Center // Center the SearchBar horizontally
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-//                    SearchBar()  // This SearchBar is now centered
+                    SearchBar(searchText = searchText, onSearchTextChange = onSearchTextChange)
                 }
             },
             bottomBar = { BottomBar(modifier = Modifier.fillMaxWidth()) },
@@ -121,11 +146,9 @@ fun BottomAppBarExample() {
                     modifier = Modifier
                         .padding(innerPadding)
                         .padding(10.dp)
-
                 ) {
-                    val pvm = PersonaViewModel()
-                    val originalList = fetchList(modifier = Modifier, personaViewModel = pvm)
-                    ListItemList(modifier = Modifier, originalList = originalList)
+                    // Pass filteredList and loading state to ListItemList
+                    ListItemList(modifier = Modifier, filteredList = filteredList, isLoading = isLoading)
                 }
             }
         )
@@ -164,8 +187,8 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .weight(0.3f) // Adjust the weight as needed for the image
-                    .clip(shape = TriangleShape()) // Use a custom shape for the angled cut
+                    .weight(0.3f)
+                    .clip(shape = TriangleShape())
             ) {
                 Image(
                     painter = painterResource(listitem.img),
@@ -178,7 +201,7 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
             }
             Column(
                 modifier = Modifier
-                    .weight(0.6f) // Adjust the weight for the text
+                    .weight(0.6f)
                     .padding(16.dp)
                     .fillMaxHeight()
             ) {
@@ -189,7 +212,7 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
             }
             Column(
                 modifier = Modifier
-                    .weight(0.3f) // Adjust the weight for the text
+                    .weight(0.3f)
                     .padding(16.dp)
                     .fillMaxHeight()
             ) {
@@ -200,7 +223,7 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
             }
             Column(
                 modifier = Modifier
-                    .weight(0.6f) // Adjust the weight for the text
+                    .weight(0.6f)
                     .padding(16.dp)
                     .fillMaxHeight()
             ) {
@@ -218,8 +241,9 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
 private fun ListCardPreview() {
 //    ListCard(ListItem("R.string.v",R.drawable.i_prc0b0_tmx_1))
 }
+
 @Composable
-fun fetchList (modifier: Modifier, personaViewModel: PersonaViewModel): List<Persona> {
+fun fetchList(modifier: Modifier, personaViewModel: PersonaViewModel): List<Persona> {
     var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
@@ -227,7 +251,7 @@ fun fetchList (modifier: Modifier, personaViewModel: PersonaViewModel): List<Per
         withContext(Dispatchers.IO) {
             try {
                 Log.d("ListItemList", "Fetching data...")
-                delay(5000) // Simulate network delay for testing
+                delay(1000) // Simulate network delay for testing
                 personaList = PersonaJSON.makeList(personaViewModel) // Pass the ViewModel
                 Log.d("ListItemList", "Data fetched: ${personaList.size} items") // Log the size of the list
             } catch (e: Exception) {
@@ -238,48 +262,17 @@ fun fetchList (modifier: Modifier, personaViewModel: PersonaViewModel): List<Per
         }
     }
 
-    if (isLoading) {
-        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-    } else {
-        if (personaList.isNotEmpty()) {
-            return personaList
-        }
-    }
-
-    return emptyList()
+    // Return the fetched list even if it's empty while loading
+    return personaList
 }
 
 @Composable
-fun ListItemList(modifier: Modifier = Modifier, originalList: List<Persona>) {
-    var filteredList by remember { mutableStateOf(originalList) }
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
-
-    LaunchedEffect(originalList) { // Ensures the list is shown only when data has been fetched
-        filteredList = originalList
-    }
-
-    // Function to filter the list based on the search text
-    fun filterList(query: String) {
-        filteredList = if (query.isBlank()) {
-            originalList // Show all if the search query is empty
-        } else {
-            originalList.filter { persona ->
-                persona.name.contains(query, ignoreCase = true) // Filter the list
-            }
+fun ListItemList(modifier: Modifier = Modifier, filteredList: List<Persona>, isLoading: Boolean) {
+    if (isLoading) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-    }
-
-    Column {
-        // Search bar
-        SearchBar(
-            modifier = Modifier.padding(16.dp),
-            searchText = searchText,
-            onSearchTextChange = { newText ->
-                searchText = newText
-                filterList(newText.text) // Filter the list on text change
-            }
-        )
-
+    } else {
         LazyColumn(modifier = modifier) {
             items(filteredList) { listItem ->
                 Log.d("ListItemList", "Rendering item: ${listItem.name}")
@@ -339,7 +332,7 @@ fun BottomBar (modifier: Modifier) {
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    searchText: TextFieldValue,
+    searchText: TextFieldValue = TextFieldValue(""),
     onSearchTextChange: (TextFieldValue) -> Unit
 ) {
     Box(
@@ -387,3 +380,4 @@ fun SearchBar(
         }
     }
 }
+

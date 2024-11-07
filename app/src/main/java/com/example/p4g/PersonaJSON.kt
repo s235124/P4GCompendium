@@ -14,18 +14,6 @@ data class Entity(
     val stats: List<Int>
 )
 
-//fun main () {
-//    println("Making list")
-//    var i = 0
-//    val p = PersonaJSON.makeList()
-//    for (persona in p) {
-//        i++
-//        println("Persona number $i\n")
-//        println(persona.name)
-//    }
-//    println("list is done")
-//}
-
 class PersonaJSON {
     companion object {
         fun makeList(personaViewModel: PersonaViewModel): ArrayList<Persona> {
