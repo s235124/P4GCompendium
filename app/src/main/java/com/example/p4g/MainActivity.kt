@@ -249,15 +249,18 @@ fun fetchList(modifier: Modifier, personaViewModel: PersonaViewModel): List<Pers
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
-            try {
-                Log.d("ListItemList", "Fetching data...")
-                delay(1000) // Simulate network delay for testing
-                personaList = PersonaJSON.makeList(personaViewModel) // Pass the ViewModel
-                Log.d("ListItemList", "Data fetched: ${personaList.size} items") // Log the size of the list
-            } catch (e: Exception) {
-                Log.e("ListItemList", "Error fetching data: ${e.message}")
-            } finally {
-                isLoading = false // Ensure loading state is updated
+            while (personaList.isEmpty()) {
+                try {
+                    Log.d("ListItemList", "Fetching data...")
+                    val pvm = PersonaViewModel()
+                    delay(1000) // Simulate network delay for testing
+                    personaList = PersonaJSON.makeList(pvm) // Pass the ViewModel
+                    Log.d("ListItemList", "Data fetched: ${personaList.size} items") // Log the size of the list
+                } catch (e: Exception) {
+                    Log.e("ListItemList", "Error fetching data: ${e.message}")
+                } finally {
+                    isLoading = false // Ensure loading state is updated
+                }
             }
         }
     }
