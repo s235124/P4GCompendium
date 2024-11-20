@@ -1,5 +1,6 @@
 package com.example.p4g
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -7,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -52,19 +54,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.p4g.HTTP.PersonaViewModel
 import com.example.p4g.listItems.ListItem
 import com.example.p4g.ui.theme.P4GTheme
@@ -72,6 +71,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
+const val GOLDEN_COLOR = 0xFFFFe52C
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +85,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview
 @Composable
 fun P4GCompendiumApp () {
     MainPage()
@@ -155,23 +154,6 @@ fun BottomAppBarExample(
     }
 }
 
-class TriangleShape : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        val path = Path().apply {
-            moveTo(0f, 0f)
-            lineTo(size.width, 0f)
-            lineTo(size.width, size.height)
-            lineTo(0f, size.height)
-            close()
-        }
-        return Outline.Generic(path)
-    }
-}
-
 @Composable
 fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
     // Calculate % of screen height
@@ -179,67 +161,102 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
     val cardHeight = screenHeight * 0.1f
 
     Card(modifier = modifier.height(cardHeight)) {
-        Row (modifier = Modifier.clickable(
+        Row(
+            modifier = Modifier.clickable(
                 onClick = { /* go to specific personas page */ },
                 indication = rememberRipple(bounded = true), // Ripple effect for feedback
                 interactionSource = remember { MutableInteractionSource() }
-                )) {
+            )
+                .background(color = Color.Yellow)
+        ) {
+            // Image container
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(0.3f)
-                    .clip(shape = TriangleShape())
+                    .clip(shape = RoundedCornerShape(100))
             ) {
                 Image(
                     painter = painterResource(listitem.img),
                     contentDescription = listitem.name,
                     modifier = Modifier
                         .fillMaxSize()
-                        .clip(shape = TriangleShape()), // Ensure the image fits the angled shape
+                        .clip(shape = RoundedCornerShape(1)), // Ensure the image fits the angled shape
                     contentScale = ContentScale.FillWidth
                 )
             }
+
+            // Main text container
             Column(
                 modifier = Modifier
-                    .weight(0.6f)
+                    .weight(0.7f) // Adjust the weight as needed
                     .padding(16.dp)
                     .fillMaxHeight()
             ) {
-                Text(
-                    text = listitem.name,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .weight(0.3f)
-                    .padding(16.dp)
-                    .fillMaxHeight()
-            ) {
-                Text(
-                    text = listitem.level.toString(),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .weight(0.6f)
-                    .padding(16.dp)
-                    .fillMaxHeight()
-            ) {
-                Text(
-                    text = listitem.race,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                // First text spanning the full width
+                Box (
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.3f)
+//                        .clip(shape = RoundedCornerShape(100))
+                        .background(color = Color(GOLDEN_COLOR))
+                        .border(1.dp, Color.Black)
+                ){
+                    Text(
+                        text = listitem.name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                // Row for the other two texts
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp) // Space between name and other texts
+                ) {
+                    // Second text (level)
+                    Text(
+                        text = listitem.level.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 18.sp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(color = Color(GOLDEN_COLOR))
+                            .border(1.dp, Color.Black),
+                        textAlign = TextAlign.Center
+                    )
+
+                    // Third text (race)
+                    Text(
+                        text = listitem.race,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 18.sp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(color = Color(GOLDEN_COLOR))
+                            .border(1.dp, Color.Black),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
+
 }
 
 @Preview
 @Composable
 private fun ListCardPreview() {
-//    ListCard(ListItem("R.string.v",R.drawable.i_prc0b0_tmx_1))
+    ListCard(ListItem(
+        name = "Yurlungur",
+        img = R.drawable.i_prc0b0_tmx_1,
+        level = 21,
+        race = "Fool"
+    ))
+
 }
 
 @Composable
@@ -269,6 +286,7 @@ fun fetchList(modifier: Modifier, personaViewModel: PersonaViewModel): List<Pers
     return personaList
 }
 
+@SuppressLint("DiscouragedApi")
 @Composable
 fun ListItemList(modifier: Modifier = Modifier, filteredList: List<Persona>, isLoading: Boolean) {
     if (isLoading) {
@@ -277,13 +295,35 @@ fun ListItemList(modifier: Modifier = Modifier, filteredList: List<Persona>, isL
         }
     } else {
         LazyColumn(modifier = modifier) {
+            // A bit of an unorthodox way of getting images for cards, but alas, a way
+            var i = 1
             items(filteredList) { listItem ->
                 Log.d("ListItemList", "Rendering item: ${listItem.name}")
-                val lItem = ListItem(listItem.name, R.drawable.i_prc0b0_tmx_1, listItem.level, listItem.race)
+
+                val fetchableName = listItem.name
+                    .replace(' ','_')
+                    .replace('-', '_')
+                    .lowercase()
+
+                // Get the drawable resource ID using the name
+                val context = LocalContext.current
+                val drawableName = fetchableName // Ensure the name matches the drawable resource format
+                val drawableResId = context.resources.getIdentifier(
+                    drawableName,
+                    "drawable",
+                    context.packageName
+                )
+
+                // Set a default drawable if the resource ID is not found
+                val finalDrawable = if (drawableResId != 0) drawableResId else R.drawable.i_prc0b0_tmx_1
+
+                val lItem = ListItem(listItem.name, finalDrawable, listItem.level, listItem.race)
                 ListCard(
                     listitem = lItem,
                     modifier = Modifier.padding(8.dp)
                 )
+
+                i++
             }
         }
     }
