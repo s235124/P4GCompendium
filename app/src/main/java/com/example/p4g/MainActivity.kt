@@ -298,7 +298,7 @@ fun ListItemList(modifier: Modifier = Modifier, filteredList: List<Persona>, isL
             // A bit of an unorthodox way of getting images for cards, but alas, a way
             var i = 1
             items(filteredList) { listItem ->
-                Log.d("ListItemList", "Rendering item: ${listItem.name}")
+//                Log.d("ListItemList", "Rendering item: ${listItem.name}")
 
                 val fetchableName = listItem.name
                     .replace(' ','_')
