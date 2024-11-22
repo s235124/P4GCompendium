@@ -1,7 +1,16 @@
 package com.example.p4g
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -9,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontVariation.width
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,7 +32,18 @@ data class Resistances(
     val wind: String,
     val dark: String,
     val light: String
-)
+) {
+    // Constructor for the converter function
+    constructor(list: ArrayList<String>) :
+            this (list.get(0),
+                list.get(1),
+                list.get(2),
+                list.get(3),
+                list.get(4),
+                list.get(5),
+                list.get(6),
+                list.get(7),)
+}
 
 //objekt af Resistance for test
 val resistanceValues = Resistances(
@@ -41,6 +60,18 @@ val resistanceValues = Resistances(
 //Kørsel af selve skærmen
 @Composable
 fun KarakterScreen() {
+
+    // p should be replaced with the actual persona obj
+    val p = Persona(
+        name = "Sandman",
+        race = "Strength",
+        level = 5,
+        inherits = "Wind",
+        resists = "---wsSS-"
+    )
+
+    p.stats.addAll(listOf(4,5,6,4,3))
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,10 +79,10 @@ fun KarakterScreen() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp) //luft mellem elementer
     ) {
-        Title() //titel øverst
-        KarakterBaseInfo() //grundlæggende karakterinfo nedenfor
-        StatsSection()
-        ResistanceSection(resistanceValues)
+        Title(p.name) //titel øverst
+        KarakterBaseInfo(p.race, p.level) //grundlæggende karakterinfo nedenfor
+        StatsSection(p.stats)
+        ResistanceSection(personaResistanceToResistanceObject(p.resists))
     }
 }
 
@@ -65,7 +96,7 @@ fun PreviewKarakterScreen() {
 
 
 @Composable
-fun Title() {
+fun Title(name : String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -76,7 +107,7 @@ fun Title() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Sandman",
+            text = name,
             fontWeight = FontWeight.Bold,
             fontSize = 25.sp,
             color = Color.Black
@@ -87,7 +118,7 @@ fun Title() {
 
 
 @Composable
-fun KarakterBaseInfo() {
+fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed as it is not part of our API
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -208,7 +239,8 @@ fun KarakterBaseInfo() {
 
 
 @Composable
-fun StatsSection() {
+fun StatsSection(stats : ArrayList<Int>) {
+    var i = 0
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -245,9 +277,9 @@ fun StatsSection() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    StatBox(label = "Strength", value = "4")
-                    StatBox(label = "Magic", value = "5")
-                    StatBox(label = "Endurance", value = "6")
+                    StatBox(label = "Strength", value = stats[i++].toString())
+                    StatBox(label = "Magic", value = stats[i++].toString())
+                    StatBox(label = "Endurance", value = stats[i++].toString())
                 }
 
                 //2. række
@@ -255,8 +287,8 @@ fun StatsSection() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    StatBox(label = "Agility", value = "4")
-                    StatBox(label = "Luck", value = "3")
+                    StatBox(label = "Agility", value = stats[i++].toString())
+                    StatBox(label = "Luck", value = stats[i++].toString())
                 }
             }
         }
@@ -464,4 +496,19 @@ fun ResistanceSection(resistances: Resistances) {
     }
 }
 
+fun personaResistanceToResistanceObject (resistStr : String): Resistances {
+    val resArr = ArrayList<String>()
 
+    for (character in resistStr) {
+        when (character) {
+            's' -> resArr.add("Resists")
+            'S' -> resArr.add("None")
+            'w' -> resArr.add("Weak")
+            'n' -> resArr.add("Nullifies")
+            'd' -> resArr.add("Absorbs")
+            'r' -> resArr.add("Repels")
+            else -> resArr.add("None")
+        }
+    }
+    return Resistances(resArr)
+}
