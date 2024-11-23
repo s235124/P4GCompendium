@@ -241,58 +241,58 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
 @Composable
 fun StatsSection(stats : ArrayList<Int>) {
     var i = 0
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.Gray)
+            .padding(5.dp)
+    ) {
+        //stats titel
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.Gray)
-                .padding(5.dp)
+                .background(Color.Yellow)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
         ) {
-            //stats titel
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Yellow)
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
+            Text(
+                text = "Stats",
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                fontSize = 18.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp)) //luft mellem header og indhold
+
+        //stats Row (2 rækker med stats)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            //1. række
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(
-                    text = "Stats",
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    fontSize = 18.sp
-                )
+                StatBox(label = "Strength", value = stats[i++].toString())
+                StatBox(label = "Magic", value = stats[i++].toString())
+                StatBox(label = "Endurance", value = stats[i++].toString())
             }
 
-            Spacer(modifier = Modifier.height(8.dp)) //luft mellem header og indhold
-
-            //stats Row (2 rækker med stats)
-            Column(
+            //2. række
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                //1. række
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    StatBox(label = "Strength", value = stats[i++].toString())
-                    StatBox(label = "Magic", value = stats[i++].toString())
-                    StatBox(label = "Endurance", value = stats[i++].toString())
-                }
-
-                //2. række
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    StatBox(label = "Agility", value = stats[i++].toString())
-                    StatBox(label = "Luck", value = stats[i++].toString())
-                }
+                StatBox(label = "Agility", value = stats[i++].toString())
+                StatBox(label = "Luck", value = stats[i++].toString())
             }
         }
     }
+}
 
     @Composable
     fun StatBox(label: String, value: String) {
