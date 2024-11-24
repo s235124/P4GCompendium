@@ -1,5 +1,6 @@
 package com.example.p4g.Screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,46 +32,48 @@ import com.example.p4g.model.Resistances
 @Composable
 fun KarakterScreen(persona: Persona?, onNavigateBack: () -> Unit) {
 
-    // p should be replaced with the actual persona obj
-    val p = persona
-
-    if (p != null) {
+    if (persona != null) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-//                .background(Color.Black)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp), //luft mellem elementer
         ) {
-            item{Title(p.name)} //titel øverst
-            item{KarakterBaseInfo(p.race, p.level)} //grundlæggende karakterinfo nedenfor
-            item{StatsSection(p.stats)}
-            item{ResistanceSection(personaResistanceToResistanceObject(p.resists))}
+            item { Title(persona.name, persona.img) } //titel øverst
+            item { KarakterBaseInfo(persona.race, persona.level) } //grundlæggende karakterinfo nedenfor
+            item { StatsSection(persona.stats) }
+            item { ResistanceSection(personaResistanceToResistanceObject(persona.resists)) }
         }
     }
 }
 
 @Composable
-fun Title(name : String) {
+fun Title(name : String, img : Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp)) //runde kanter
             .background(Color.Yellow)
-            .padding(16.dp)//indvendig afstand
-            ,
-        contentAlignment = Alignment.Center
+            .padding(16.dp), //indvendig afstand
     ) {
-        Text(
-            text = name,
-            fontWeight = FontWeight.Bold,
-            fontSize = 25.sp,
-            color = Color.Black
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally // Align children in the center
+        ) {
+            Text(
+                text = name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp,
+                color = Color.Black
+            )
+            Image(
+                painter = painterResource(img),
+                contentDescription = "Persona: $name",
+                modifier = Modifier.size(150.dp)
+            )
+        }
     }
 }
-
-
 
 @Composable
 fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed as it is not part of our API
@@ -82,15 +87,16 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
     ) {
         //1. kolonne: Arcana
         Column(
-            modifier = Modifier.weight(1f) //giver lige meget plads til hver kolonne
+            modifier = Modifier.weight(1f), //giver lige meget plads til hver kolonne
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
-                    .width(100.dp) //fast bredde
+                    .fillMaxWidth(0.9F)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.Yellow)
-                    .padding(8.dp)
-                , contentAlignment = Alignment.Center
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "Arcana",
@@ -102,7 +108,7 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
             Spacer(modifier = Modifier.height(8.dp)) // Luft mellem bokse
 
             Box(Modifier
-                .width(100.dp) //bredde
+                .fillMaxWidth(0.9F) //bredde
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.LightGray)
                 .padding(8.dp),
@@ -117,11 +123,12 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
 
         //2. kolonne: Lvl
         Column(
-            modifier = Modifier.weight(1f) // Giver lige meget plads til hver kolonne
+            modifier = Modifier.weight(1f), // Giver lige meget plads til hver kolonne
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 Modifier
-                    .width(60.dp) //bredde
+                    .fillMaxWidth(0.9F) //bredde
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.Yellow)
                     .padding(8.dp),
@@ -138,7 +145,7 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
 
             Box(
                 Modifier
-                    .width(60.dp)
+                    .fillMaxWidth(0.9F)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.LightGray)
                     .padding(8.dp),
@@ -251,6 +258,7 @@ fun StatsSection(stats : ArrayList<Int>) {
 fun StatBox(label: String, value: String) {
     Column(
         modifier = Modifier
+            .width(100.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(Color.LightGray)
             .padding(8.dp),

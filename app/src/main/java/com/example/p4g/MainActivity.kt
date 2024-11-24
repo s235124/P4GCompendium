@@ -11,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
@@ -34,7 +34,9 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,6 +63,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.p4g.HTTP.PersonaViewModel
 import com.example.p4g.model.ListItem
@@ -99,26 +102,38 @@ fun P4GCompendiumApp() {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
     modifier: Modifier = Modifier,
     navController: NavHostController, // Pass the NavController
     onRouteChanged: (Route) -> Unit // Callback to handle route changes
 ) {
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val canNavigateBack = currentBackStackEntry?.destination?.route?.startsWith("persona_screen") == true
+
     Scaffold(
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "P4G Compendium",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "P4G Compendium",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(8.dp),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                navigationIcon = {
+                    if (canNavigateBack) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+            )
         },
         bottomBar = { BottomBar(modifier = Modifier.fillMaxWidth()) },
         content = { innerPadding ->
@@ -159,7 +174,7 @@ fun MainContent(
         it.name.contains(searchText.text, ignoreCase = true)
     }
 
-    Column(modifier = Modifier.padding(10.dp)) {
+    Column(modifier = Modifier.padding(10.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         SearchBar(searchText = searchText, onSearchTextChange = { newText -> searchText = newText })
 
         ListItemList(
@@ -264,22 +279,6 @@ fun ListCard(persona: Persona, modifier: Modifier = Modifier, onClick: (Persona)
     }
 
 }
-
-//@Preview
-//@Composable
-//private fun ListCardPreview() {
-//    ListCard(
-//        persona = Persona(
-//            name = "Yurlungur",
-//            img = R.drawable.i_prc0b0_tmx_1,
-//            level = 21,
-//            race = "Fool",
-//        ),
-//        modifier = TODO(),
-//        onClick = TODO()
-//    )
-//
-//}
 
 @Composable
 fun fetchList(modifier: Modifier): List<Persona> {

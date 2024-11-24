@@ -8,8 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.p4g.MainContent
-import com.example.p4g.model.Persona
 import com.example.p4g.Screen.KarakterScreen
+import com.example.p4g.model.Persona
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
