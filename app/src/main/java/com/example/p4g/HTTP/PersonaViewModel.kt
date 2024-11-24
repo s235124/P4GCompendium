@@ -16,23 +16,8 @@ class PersonaViewModel : ViewModel() {
         fetchPersonas()
     }
 
-//    private fun fetchPersonas() {
-////        println("Fetching")
-//        CoroutineScope(Dispatchers.IO).launch {
-//            try {
-////                println("Trying")
-//                _personas.value = RetrofitInstance.api.getPersonas()
-//                delay(1000)
-//            }
-//            catch (e: Exception) {
-//                e.printStackTrace()
-//            }
-//        }
-//    }
-
     private fun fetchPersonas() {
         // Launch the network call in an IO thread for efficiency
-//        CoroutineScope(Dispatchers.IO).launch {
         viewModelScope.launch {
             try {
                 // Fetch the personas asynchronously
