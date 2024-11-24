@@ -100,69 +100,7 @@ fun P4GCompendiumApp() {
 }
 
 
-/*@Composable
-fun MainPage(modifier: Modifier = Modifier) {
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
-    var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
 
-    // Fetch persona list
-    val originalList = fetchList(modifier = Modifier, personaViewModel = PersonaViewModel())
-
-    // Once fetched, update the persona list and set loading to false
-    LaunchedEffect(originalList) {
-        if (originalList.isNotEmpty()) {
-            personaList = originalList
-            isLoading = false
-        }
-    }
-
-    // Filtering logic
-    val filteredList = personaList.filter {
-        it.name.contains(searchText.text, ignoreCase = true)
-    }
-
-    BottomAppBarExample(
-        searchText = searchText,
-        onSearchTextChange = { newText -> searchText = newText },
-        filteredList = filteredList,
-        isLoading = isLoading
-    )
-}*/
-
-/*@Composable
-fun BottomAppBarExample(
-    searchText: TextFieldValue,
-    onSearchTextChange: (TextFieldValue) -> Unit,
-    filteredList: List<Persona>,
-    isLoading: Boolean
-) {
-    Column(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues())) {
-        Scaffold(
-            topBar = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    SearchBar(searchText = searchText, onSearchTextChange = onSearchTextChange)
-                }
-            },
-            bottomBar = { BottomBar(modifier = Modifier.fillMaxWidth()) },
-            content = { innerPadding ->
-                Column(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(10.dp)
-                ) {
-                    // Pass filteredList and loading state to ListItemList
-                    ListItemList(modifier = Modifier, filteredList = filteredList, isLoading = isLoading)
-                }
-            }
-        )
-    }
-}*/
 
 @Composable
 fun MainPage(
@@ -221,7 +159,7 @@ fun MainContent(
 
     // Filtering logic
     val filteredList = personaList.filter {
-        it.name.contains(searchText.text, ignoreCase = true)
+        it.name.startsWith(searchText.text, ignoreCase = true)
     }
 
     Column(modifier = Modifier.padding(10.dp)) {

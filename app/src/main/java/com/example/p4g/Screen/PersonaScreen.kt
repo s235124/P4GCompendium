@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,8 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -38,9 +38,10 @@ fun PersonaScreen(name: String?, onNavigateBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onNavigateBack) {
-                    Icon(imageVector = Icons.Default.Home, contentDescription = "Back")
+                    // Replaced the Home icon with ArrowBack
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
                 }
-                Text(text = name ?: "Persona Details", style = MaterialTheme.typography.titleLarge)
+                Text(text = name ?: "Persona Details", style = MaterialTheme.typography.titleLarge,)
             }
         },
         content = {
@@ -53,6 +54,3 @@ fun PersonaScreen(name: String?, onNavigateBack: () -> Unit) {
         }
     )
 }
-
-
-
