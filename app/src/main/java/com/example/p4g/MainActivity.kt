@@ -16,15 +16,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -64,8 +61,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.p4g.HTTP.PersonaViewModel
 import com.example.p4g.listItems.ListItem
+import com.example.p4g.navigation.MainNavHost
+import com.example.p4g.navigation.Route
 import com.example.p4g.ui.theme.P4GTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -86,11 +87,20 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun P4GCompendiumApp () {
-    MainPage()
+fun P4GCompendiumApp() {
+    val navController = rememberNavController()
+
+    MainPage(
+        navController = navController,
+        onRouteChanged = { route ->
+            Log.d("P4GCompendiumApp", "Navigated to route: ${route.title}")
+        },
+        modifier = Modifier.fillMaxSize()
+    )
 }
 
-@Composable
+
+/*@Composable
 fun MainPage(modifier: Modifier = Modifier) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
@@ -118,9 +128,9 @@ fun MainPage(modifier: Modifier = Modifier) {
         filteredList = filteredList,
         isLoading = isLoading
     )
-}
+}*/
 
-@Composable
+/*@Composable
 fun BottomAppBarExample(
     searchText: TextFieldValue,
     onSearchTextChange: (TextFieldValue) -> Unit,
@@ -152,10 +162,83 @@ fun BottomAppBarExample(
             }
         )
     }
-}
+}*/
 
 @Composable
-fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
+fun MainPage(
+    modifier: Modifier = Modifier,
+    navController: NavHostController, // Pass the NavController
+    onRouteChanged: (Route) -> Unit // Callback to handle route changes
+) {
+    Scaffold(
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "P4G Compendium",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+        },
+        bottomBar = { BottomBar(modifier = Modifier.fillMaxWidth()) },
+        content = { innerPadding ->
+            // Embed the navigation host within the page
+            MainNavHost(
+                navController = navController,
+                onRouteChanged = onRouteChanged,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            )
+        }
+    )
+}
+
+
+@Composable
+fun MainContent(
+    onNavigateToPersonaScreen: (ListItem) -> Unit
+) {
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Fetch persona list
+    val originalList = fetchList(modifier = Modifier, personaViewModel = PersonaViewModel())
+
+    // Once fetched, update the persona list and set loading to false
+    LaunchedEffect(originalList) {
+        if (originalList.isNotEmpty()) {
+            personaList = originalList
+            isLoading = false
+        }
+    }
+
+    // Filtering logic
+    val filteredList = personaList.filter {
+        it.name.contains(searchText.text, ignoreCase = true)
+    }
+
+    Column(modifier = Modifier.padding(10.dp)) {
+        SearchBar(searchText = searchText, onSearchTextChange = { newText -> searchText = newText })
+
+        ListItemList(
+            modifier = Modifier.fillMaxSize(),
+            filteredList = filteredList,
+            isLoading = isLoading,
+            onCardClick = { onNavigateToPersonaScreen(it) }
+        )
+    }
+}
+
+
+@Composable
+fun ListCard(listitem: ListItem, modifier: Modifier = Modifier, onClick: (ListItem) -> Unit) {
     // Calculate % of screen height
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val cardHeight = screenHeight * 0.1f
@@ -163,7 +246,7 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
     Card(modifier = modifier.height(cardHeight)) {
         Row(
             modifier = Modifier.clickable(
-                onClick = { /* go to specific personas page */ },
+                onClick = { onClick(listitem) },
                 indication = rememberRipple(bounded = true), // Ripple effect for feedback
                 interactionSource = remember { MutableInteractionSource() }
             )
@@ -250,12 +333,16 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun ListCardPreview() {
-    ListCard(ListItem(
-        name = "Yurlungur",
-        img = R.drawable.i_prc0b0_tmx_1,
-        level = 21,
-        race = "Fool"
-    ))
+    ListCard(
+        ListItem(
+            name = "Yurlungur",
+            img = R.drawable.i_prc0b0_tmx_1,
+            level = 21,
+            race = "Fool"
+        ),
+        modifier = TODO(),
+        onClick = TODO()
+    )
 
 }
 
@@ -288,7 +375,12 @@ fun fetchList(modifier: Modifier, personaViewModel: PersonaViewModel): List<Pers
 
 @SuppressLint("DiscouragedApi")
 @Composable
-fun ListItemList(modifier: Modifier = Modifier, filteredList: List<Persona>, isLoading: Boolean) {
+fun ListItemList(
+    modifier: Modifier = Modifier,
+    filteredList: List<Persona>,
+    isLoading: Boolean,
+    onCardClick: (ListItem) -> Unit
+) {
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -320,7 +412,8 @@ fun ListItemList(modifier: Modifier = Modifier, filteredList: List<Persona>, isL
                 val lItem = ListItem(listItem.name, finalDrawable, listItem.level, listItem.race)
                 ListCard(
                     listitem = lItem,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(8.dp),
+                    onClick = onCardClick
                 )
 
                 i++
