@@ -2,6 +2,8 @@ package com.example.p4g
 
 import android.util.Log
 import com.example.p4g.HTTP.PersonaViewModel
+import com.example.p4g.model.Persona
+import com.example.p4g.model.Skills
 import kotlinx.serialization.Serializable
 
 @Serializable

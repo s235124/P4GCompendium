@@ -58,13 +58,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.p4g.HTTP.PersonaViewModel
-import com.example.p4g.listItems.ListItem
+import com.example.p4g.model.ListItem
+import com.example.p4g.model.Persona
 import com.example.p4g.navigation.MainNavHost
 import com.example.p4g.navigation.Route
 import com.example.p4g.ui.theme.P4GTheme
@@ -98,71 +98,6 @@ fun P4GCompendiumApp() {
         modifier = Modifier.fillMaxSize()
     )
 }
-
-
-/*@Composable
-fun MainPage(modifier: Modifier = Modifier) {
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
-    var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-
-    // Fetch persona list
-    val originalList = fetchList(modifier = Modifier, personaViewModel = PersonaViewModel())
-
-    // Once fetched, update the persona list and set loading to false
-    LaunchedEffect(originalList) {
-        if (originalList.isNotEmpty()) {
-            personaList = originalList
-            isLoading = false
-        }
-    }
-
-    // Filtering logic
-    val filteredList = personaList.filter {
-        it.name.contains(searchText.text, ignoreCase = true)
-    }
-
-    BottomAppBarExample(
-        searchText = searchText,
-        onSearchTextChange = { newText -> searchText = newText },
-        filteredList = filteredList,
-        isLoading = isLoading
-    )
-}*/
-
-/*@Composable
-fun BottomAppBarExample(
-    searchText: TextFieldValue,
-    onSearchTextChange: (TextFieldValue) -> Unit,
-    filteredList: List<Persona>,
-    isLoading: Boolean
-) {
-    Column(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues())) {
-        Scaffold(
-            topBar = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    SearchBar(searchText = searchText, onSearchTextChange = onSearchTextChange)
-                }
-            },
-            bottomBar = { BottomBar(modifier = Modifier.fillMaxWidth()) },
-            content = { innerPadding ->
-                Column(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(10.dp)
-                ) {
-                    // Pass filteredList and loading state to ListItemList
-                    ListItemList(modifier = Modifier, filteredList = filteredList, isLoading = isLoading)
-                }
-            }
-        )
-    }
-}*/
 
 @Composable
 fun MainPage(
@@ -202,14 +137,14 @@ fun MainPage(
 
 @Composable
 fun MainContent(
-    onNavigateToPersonaScreen: (ListItem) -> Unit
+    onNavigateToPersonaScreen: (Persona) -> Unit
 ) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
     // Fetch persona list
-    val originalList = fetchList(modifier = Modifier, personaViewModel = PersonaViewModel())
+    val originalList = fetchList(modifier = Modifier)
 
     // Once fetched, update the persona list and set loading to false
     LaunchedEffect(originalList) {
@@ -238,7 +173,8 @@ fun MainContent(
 
 
 @Composable
-fun ListCard(listitem: ListItem, modifier: Modifier = Modifier, onClick: (ListItem) -> Unit) {
+fun ListCard(persona: Persona, modifier: Modifier = Modifier, onClick: (Persona) -> Unit) {
+    val listitem = ListItem(persona)
     // Calculate % of screen height
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val cardHeight = screenHeight * 0.1f
@@ -246,7 +182,7 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier, onClick: (ListIt
     Card(modifier = modifier.height(cardHeight)) {
         Row(
             modifier = Modifier.clickable(
-                onClick = { onClick(listitem) },
+                onClick = { onClick(persona) },
                 indication = rememberRipple(bounded = true), // Ripple effect for feedback
                 interactionSource = remember { MutableInteractionSource() }
             )
@@ -281,7 +217,6 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier, onClick: (ListIt
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
-//                        .clip(shape = RoundedCornerShape(100))
                         .background(color = Color(GOLDEN_COLOR))
                         .border(1.dp, Color.Black)
                 ){
@@ -330,24 +265,24 @@ fun ListCard(listitem: ListItem, modifier: Modifier = Modifier, onClick: (ListIt
 
 }
 
-@Preview
-@Composable
-private fun ListCardPreview() {
-    ListCard(
-        ListItem(
-            name = "Yurlungur",
-            img = R.drawable.i_prc0b0_tmx_1,
-            level = 21,
-            race = "Fool"
-        ),
-        modifier = TODO(),
-        onClick = TODO()
-    )
+//@Preview
+//@Composable
+//private fun ListCardPreview() {
+//    ListCard(
+//        persona = Persona(
+//            name = "Yurlungur",
+//            img = R.drawable.i_prc0b0_tmx_1,
+//            level = 21,
+//            race = "Fool",
+//        ),
+//        modifier = TODO(),
+//        onClick = TODO()
+//    )
+//
+//}
 
-}
-
 @Composable
-fun fetchList(modifier: Modifier, personaViewModel: PersonaViewModel): List<Persona> {
+fun fetchList(modifier: Modifier): List<Persona> {
     var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
@@ -379,7 +314,7 @@ fun ListItemList(
     modifier: Modifier = Modifier,
     filteredList: List<Persona>,
     isLoading: Boolean,
-    onCardClick: (ListItem) -> Unit
+    onCardClick: (Persona) -> Unit
 ) {
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -409,9 +344,11 @@ fun ListItemList(
                 // Set a default drawable if the resource ID is not found
                 val finalDrawable = if (drawableResId != 0) drawableResId else R.drawable.i_prc0b0_tmx_1
 
-                val lItem = ListItem(listItem.name, finalDrawable, listItem.level, listItem.race)
+                listItem.img = finalDrawable
+
+//                val lItem = ListItem(listItem.name, finalDrawable, listItem.level, listItem.race)
                 ListCard(
-                    listitem = lItem,
+                    persona = listItem,
                     modifier = Modifier.padding(8.dp),
                     onClick = onCardClick
                 )

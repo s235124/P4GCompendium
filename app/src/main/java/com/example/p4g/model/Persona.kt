@@ -1,9 +1,12 @@
-package com.example.p4g
+package com.example.p4g.model
 
 import androidx.annotation.DrawableRes
+import com.example.p4g.R
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Persona (
-    @DrawableRes val img: Int,
+    @DrawableRes var img: Int,
     val name: String,
     val inherits: String,
     val level: Int,

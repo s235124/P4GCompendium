@@ -1,4 +1,4 @@
-package com.example.p4g
+package com.example.p4g.Screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,81 +20,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-data class Resistances(
-    val physical: String,
-    val almighty: String,
-    val fire: String,
-    val ice: String,
-    val electricity: String,
-    val wind: String,
-    val dark: String,
-    val light: String
-) {
-    // Constructor for the converter function
-    constructor(list: ArrayList<String>) :
-            this (list.get(0),
-                list.get(1),
-                list.get(2),
-                list.get(3),
-                list.get(4),
-                list.get(5),
-                list.get(6),
-                list.get(7),)
-}
-
-//objekt af Resistance for test
-val resistanceValues = Resistances(
-    physical = "Yes",
-    almighty = "No",
-    fire = "Yes",
-    ice = "Yes",
-    electricity = "Weak",
-    wind = "Resistant",
-    dark = "Resistant",
-    light = "Yes"
-)
+import com.example.p4g.model.Persona
+import com.example.p4g.model.Resistances
 
 //Kørsel af selve skærmen
 @Composable
-fun KarakterScreen() {
+fun KarakterScreen(persona: Persona?, onNavigateBack: () -> Unit) {
 
     // p should be replaced with the actual persona obj
-    val p = Persona(
-        name = "Sandman",
-        race = "Strength",
-        level = 5,
-        inherits = "Wind",
-        resists = "---wsSS-"
-    )
+    val p = persona
 
-    p.stats.addAll(listOf(4,5,6,4,3))
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp) //luft mellem elementer
-    ) {
-        Title(p.name) //titel øverst
-        KarakterBaseInfo(p.race, p.level) //grundlæggende karakterinfo nedenfor
-        StatsSection(p.stats)
-        ResistanceSection(personaResistanceToResistanceObject(p.resists))
+    if (p != null) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+//                .background(Color.Black)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp), //luft mellem elementer
+        ) {
+            item{Title(p.name)} //titel øverst
+            item{KarakterBaseInfo(p.race, p.level)} //grundlæggende karakterinfo nedenfor
+            item{StatsSection(p.stats)}
+            item{ResistanceSection(personaResistanceToResistanceObject(p.resists))}
+        }
     }
 }
-
-//Preview af selve skærmen
-@Preview(showBackground = true)
-@Composable
-fun PreviewKarakterScreen() {
-    KarakterScreen()
-}
-
-
 
 @Composable
 fun Title(name : String) {
@@ -156,7 +109,7 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Strength",
+                    text = arcana,
                     color = Color.Black
                 )
             }
@@ -175,7 +128,7 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Lvl",
+                    text = "Level",
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
@@ -192,47 +145,47 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "5",
+                    text = level.toString(),
                     color = Color.Black
                 )
             }
         }
 
         //3. kolonne: Price
-        Column(
-            modifier = Modifier.weight(1f) //giver lige meget plads til hver kolonne
-        ) {
-            Box(
-                Modifier
-                    .width(150.dp) //fast bredde
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Yellow)
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Price",
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp)) //luft mellem bokse
-
-            Box(
-                modifier = Modifier
-                    .width(150.dp) //fast bredde
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.LightGray)
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "2484",
-                    color = Color.Black
-                )
-            }
-        }
+//        Column(
+//            modifier = Modifier.weight(1f) //giver lige meget plads til hver kolonne
+//        ) {
+//            Box(
+//                Modifier
+//                    .width(150.dp) //fast bredde
+//                    .clip(RoundedCornerShape(8.dp))
+//                    .background(Color.Yellow)
+//                    .padding(8.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Text(
+//                    text = "Price",
+//                    fontWeight = FontWeight.Bold,
+//                    color = Color.Black
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.height(8.dp)) //luft mellem bokse
+//
+//            Box(
+//                modifier = Modifier
+//                    .width(150.dp) //fast bredde
+//                    .clip(RoundedCornerShape(8.dp))
+//                    .background(Color.LightGray)
+//                    .padding(8.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Text(
+//                    text = "2484",
+//                    color = Color.Black
+//                )
+//            }
+//        }
     }
 }
 
@@ -294,27 +247,27 @@ fun StatsSection(stats : ArrayList<Int>) {
     }
 }
 
-    @Composable
-    fun StatBox(label: String, value: String) {
-        Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.LightGray)
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally //centrerer teksten horisontalt
-        ) {
-            Text(
-                text = label,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Text(
-                text = value,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        }
+@Composable
+fun StatBox(label: String, value: String) {
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.LightGray)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally //centrerer teksten horisontalt
+    ) {
+        Text(
+            text = label,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        Text(
+            text = value,
+            fontWeight = FontWeight.Normal,
+            color = Color.Black
+        )
     }
+}
 
 
 

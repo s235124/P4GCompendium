@@ -1,4 +1,4 @@
-package com.example.p4g
+package com.example.p4g.model
 
 import kotlinx.serialization.Serializable
 
