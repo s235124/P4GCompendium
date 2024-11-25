@@ -9,6 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.p4g.MainContent
 import com.example.p4g.Screen.KarakterScreen
+import com.example.p4g.Screen.SettingScreen
+import com.example.p4g.Screen.FavoriteScreen
 import com.example.p4g.model.Persona
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -46,6 +48,18 @@ fun MainNavHost(
             val personaJson = backStackEntry.arguments?.getString("pJson") // Fetch name from arguments
             val persona = personaJson?.let {Json.decodeFromString<Persona>(Uri.decode(it))}
             KarakterScreen(persona = persona, onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable(Route.SettingScreen.title){
+            onRouteChanged(Route.SettingScreen)
+            SettingScreen()
+
+        }
+
+        composable(Route.FavoriteScreen.title){
+            onRouteChanged(Route.FavoriteScreen)
+            FavoriteScreen()
+
         }
     }
 }

@@ -135,7 +135,26 @@ fun MainPage(
                 }
             )
         },
-        bottomBar = { BottomBar(modifier = Modifier.fillMaxWidth()) },
+        bottomBar = { BottomBar(
+            modifier = Modifier.fillMaxWidth(),
+            onHomeClick = {
+                navController.navigate(Route.MainPage.title) {
+                    launchSingleTop = true
+
+                }
+            },
+            onSettingsClick = {
+                navController.navigate(Route.SettingScreen.title) {
+                    launchSingleTop = true
+
+                }
+            },
+            onFavoriteClick = {
+                navController.navigate(Route.FavoriteScreen.title) {
+                    launchSingleTop = true
+                }
+            }
+        ) },
         content = { innerPadding ->
             // Embed the navigation host within the page
             MainNavHost(
@@ -359,41 +378,41 @@ fun ListItemList(
 }
 
 @Composable
-fun BottomBar (modifier: Modifier) {
+fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () -> Unit, onFavoriteClick: () -> Unit ) {
     BottomAppBar {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { /* Do something */ },
+                onClick = onHomeClick,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 Icon(
                     Icons.Filled.Home,
-                    contentDescription = "Localized description",
+                    contentDescription = "Home",
                     modifier = Modifier.size(32.dp)
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
-                onClick = { /* do something */ },
+                onClick = onFavoriteClick,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 Icon(
                     Icons.Filled.Favorite,
-                    contentDescription = "Localized description",
+                    contentDescription = "Favorite",
                     modifier = Modifier.size(32.dp)
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
-                onClick = { /* do something */ },
+                onClick = onSettingsClick,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 Icon(
                     Icons.Filled.Settings,
-                    contentDescription = "Localized description",
+                    contentDescription = "Setting",
                     modifier = Modifier.size(32.dp)
                 )
             }
