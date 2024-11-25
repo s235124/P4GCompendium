@@ -23,10 +23,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.p4g.GOLDEN_COLOR
+import com.example.p4g.R
 import com.example.p4g.model.Persona
 import com.example.p4g.model.Resistances
+import com.example.p4g.model.Skills
 
 //Kørsel af selve skærmen
 @Composable
@@ -40,9 +44,10 @@ fun KarakterScreen(persona: Persona?, onNavigateBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp), //luft mellem elementer
         ) {
             item { Title(persona.name, persona.img) } //titel øverst
-            item { KarakterBaseInfo(persona.race, persona.level) } //grundlæggende karakterinfo nedenfor
+            item { KarakterBaseInfo(persona.race, persona.level, persona.inherits) } //grundlæggende karakterinfo nedenfor
             item { StatsSection(persona.stats) }
             item { ResistanceSection(personaResistanceToResistanceObject(persona.resists)) }
+            item { SkillsSection(persona.skills) }
         }
     }
 }
@@ -53,7 +58,7 @@ fun Title(name : String, img : Int) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp)) //runde kanter
-            .background(Color.Yellow)
+            .background(Color(GOLDEN_COLOR))
             .padding(16.dp), //indvendig afstand
     ) {
         Column(
@@ -76,14 +81,15 @@ fun Title(name : String, img : Int) {
 }
 
 @Composable
-fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed as it is not part of our API
+fun KarakterBaseInfo(arcana : String, level : Int, primaryElement: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(Color.Gray)
             .padding(5.dp),
-        horizontalArrangement = Arrangement.SpaceBetween //mellemrum mellem kolonner
+        horizontalArrangement = Arrangement.SpaceBetween, //mellemrum mellem kolonner
+        verticalAlignment = Alignment.Bottom
     ) {
         //1. kolonne: Arcana
         Column(
@@ -93,15 +99,17 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.9F)
+                    .height(66.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Yellow)
+                    .background(Color(GOLDEN_COLOR))
                     .padding(8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "Arcana",
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
                 )
             }
 
@@ -116,7 +124,8 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
             ) {
                 Text(
                     text = arcana,
-                    color = Color.Black
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -128,16 +137,18 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
         ) {
             Box(
                 Modifier
-                    .fillMaxWidth(0.9F) //bredde
+                    .fillMaxWidth(0.9F)
+                    .height(66.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Yellow)
+                    .background(Color(GOLDEN_COLOR))
                     .padding(8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "Level",
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
                 )
             }
 
@@ -153,46 +164,51 @@ fun KarakterBaseInfo(arcana : String, level : Int) { // Price should be removed 
             ) {
                 Text(
                     text = level.toString(),
-                    color = Color.Black
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
                 )
             }
         }
 
-        //3. kolonne: Price
-//        Column(
-//            modifier = Modifier.weight(1f) //giver lige meget plads til hver kolonne
-//        ) {
-//            Box(
-//                Modifier
-//                    .width(150.dp) //fast bredde
-//                    .clip(RoundedCornerShape(8.dp))
-//                    .background(Color.Yellow)
-//                    .padding(8.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Text(
-//                    text = "Price",
-//                    fontWeight = FontWeight.Bold,
-//                    color = Color.Black
-//                )
-//            }
-//
-//            Spacer(modifier = Modifier.height(8.dp)) //luft mellem bokse
-//
-//            Box(
-//                modifier = Modifier
-//                    .width(150.dp) //fast bredde
-//                    .clip(RoundedCornerShape(8.dp))
-//                    .background(Color.LightGray)
-//                    .padding(8.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Text(
-//                    text = "2484",
-//                    color = Color.Black
-//                )
-//            }
-//        }
+        //3. kolonne: Primary element
+        Column(
+            modifier = Modifier.weight(1f), // Giver lige meget plads til hver kolonne
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                Modifier
+                    .fillMaxWidth(0.9F)
+                    .height(66.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Primary Element",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp)) // Luft mellem bokse
+
+            Box(
+                Modifier
+                    .fillMaxWidth(0.9F)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.LightGray)
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = primaryElement,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 }
 
@@ -213,7 +229,7 @@ fun StatsSection(stats : ArrayList<Int>) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.Yellow)
+                .background(Color(GOLDEN_COLOR))
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -293,7 +309,7 @@ fun ResistanceSection(resistances: Resistances) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.Yellow)
+                .background(Color(GOLDEN_COLOR))
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -312,20 +328,58 @@ fun ResistanceSection(resistances: Resistances) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            listOf("Physical", "Almighty").forEachIndexed { index, title ->
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.Yellow)
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp)
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = title,
+                        text = "Physical",
                         color = Color.Black,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.phys),
+                        contentDescription = "Physical Affinities",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Almighty",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.almighty),
+                        contentDescription = "Almighty Affinities",
+                        modifier = Modifier.size(30.dp)
                     )
                 }
             }
@@ -362,20 +416,84 @@ fun ResistanceSection(resistances: Resistances) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            listOf("Fire", "Ice", "Electricity").forEach { title ->
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.Yellow)
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = title,
+                        text = "Fire",
                         color = Color.Black,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.fire),
+                        contentDescription = "Fire Affinities",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Ice",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.ice),
+                        contentDescription = "Ice Affinities",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Electricity",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.elec),
+                        contentDescription = "Elec Affinities",
+                        modifier = Modifier.size(30.dp)
                     )
                 }
             }
@@ -412,20 +530,84 @@ fun ResistanceSection(resistances: Resistances) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            listOf("Wind", "Dark", "Light").forEach { title ->
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.Yellow)
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = title,
+                        text = "Wind",
                         color = Color.Black,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.wind),
+                        contentDescription = "Wind Affinities",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Light",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.bless),
+                        contentDescription = "Bless Affinities",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(GOLDEN_COLOR))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Dark",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.curse),
+                        contentDescription = "Curse Affinities",
+                        modifier = Modifier.size(30.dp)
                     )
                 }
             }
@@ -437,7 +619,7 @@ fun ResistanceSection(resistances: Resistances) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            listOf(resistances.wind, resistances.dark, resistances.light).forEach { value ->
+            listOf(resistances.wind, resistances.light, resistances.dark).forEach { value ->
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -453,6 +635,99 @@ fun ResistanceSection(resistances: Resistances) {
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SkillsSection (skills: ArrayList<Skills>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.Gray)
+            .padding(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(GOLDEN_COLOR))
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Skills",
+                color = Color.Black,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            listOf("Name", "Level").forEachIndexed { index, title ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(GOLDEN_COLOR))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = title,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        skills.forEach { skill ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.LightGray)
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = skill.skillName,
+                        color = Color.Black
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.LightGray)
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val l = if (skill.gainedAtLevel < 1.0) "Innate" else skill.gainedAtLevel.toInt().toString()
+                    Text(
+                        text = l,
+                        color = Color.Black
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

@@ -4,17 +4,6 @@ import android.util.Log
 import com.example.p4g.HTTP.PersonaViewModel
 import com.example.p4g.model.Persona
 import com.example.p4g.model.Skills
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class Entity(
-    val inherits: String,
-    val lvl: Int,
-    val race: String,
-    val resists: String,
-    val skills: Map<String, Double>,
-    val stats: List<Int>
-)
 
 class PersonaJSON {
     companion object {
@@ -27,7 +16,7 @@ class PersonaJSON {
                 personas.forEach { persona ->
                     val p = Persona(
                         persona.key,
-                        persona.value.inherits,
+                        persona.value.inherits.replaceFirstChar { char -> char.titlecaseChar() },
                         persona.value.lvl,
                         persona.value.race,
                         persona.value.resists

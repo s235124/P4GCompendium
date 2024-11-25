@@ -208,7 +208,7 @@ fun MainContent(
 
 @Composable
 fun ListCard(persona: Persona, modifier: Modifier = Modifier, onClick: (Persona) -> Unit) {
-    val listitem = ListItem(persona)
+    val listItem = ListItem(persona)
     // Calculate % of screen height
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val cardHeight = screenHeight * 0.1f
@@ -220,7 +220,7 @@ fun ListCard(persona: Persona, modifier: Modifier = Modifier, onClick: (Persona)
                 indication = rememberRipple(bounded = true), // Ripple effect for feedback
                 interactionSource = remember { MutableInteractionSource() }
             )
-                .background(color = Color.Yellow)
+                .background(color = Color(GOLDEN_COLOR))
         ) {
             // Image container
             Box(
@@ -230,8 +230,8 @@ fun ListCard(persona: Persona, modifier: Modifier = Modifier, onClick: (Persona)
                     .clip(shape = RoundedCornerShape(100))
             ) {
                 Image(
-                    painter = painterResource(listitem.img),
-                    contentDescription = listitem.name,
+                    painter = painterResource(listItem.img),
+                    contentDescription = listItem.name,
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(shape = RoundedCornerShape(1)), // Ensure the image fits the angled shape
@@ -251,11 +251,11 @@ fun ListCard(persona: Persona, modifier: Modifier = Modifier, onClick: (Persona)
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(0.3f)
-                        .background(color = Color(GOLDEN_COLOR))
+                        .background(color = Color.Yellow)
                         .border(1.dp, Color.Black)
                 ){
                     Text(
-                        text = listitem.name,
+                        text = listItem.name,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.fillMaxWidth(),
                         fontSize = 18.sp,
@@ -271,24 +271,24 @@ fun ListCard(persona: Persona, modifier: Modifier = Modifier, onClick: (Persona)
                 ) {
                     // Second text (level)
                     Text(
-                        text = listitem.level.toString(),
+                        text = listItem.level.toString(),
                         style = MaterialTheme.typography.bodyLarge,
                         fontSize = 18.sp,
                         modifier = Modifier
                             .weight(1f)
-                            .background(color = Color(GOLDEN_COLOR))
+                            .background(color = Color.Yellow)
                             .border(1.dp, Color.Black),
                         textAlign = TextAlign.Center
                     )
 
                     // Third text (race)
                     Text(
-                        text = listitem.race,
+                        text = listItem.race,
                         style = MaterialTheme.typography.bodyLarge,
                         fontSize = 18.sp,
                         modifier = Modifier
                             .weight(1f)
-                            .background(color = Color(GOLDEN_COLOR))
+                            .background(color = Color.Yellow)
                             .border(1.dp, Color.Black),
                         textAlign = TextAlign.Center
                     )

@@ -6,8 +6,8 @@ data class Resistances(
     val ice: String,
     val electricity: String,
     val wind: String,
-    val dark: String,
     val light: String,
+    val dark: String,
     val almighty: String
 ) {
     // Constructor for the converter function
@@ -19,5 +19,6 @@ data class Resistances(
                 list.get(4),
                 list.get(5),
                 list.get(6),
-                list.get(7),)
+                list.get(7)
+            )
 }
