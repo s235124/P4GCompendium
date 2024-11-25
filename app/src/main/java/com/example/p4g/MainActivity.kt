@@ -31,6 +31,9 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
@@ -111,7 +114,7 @@ fun MainPage(
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val canNavigateBack = currentBackStackEntry?.destination?.route?.startsWith("persona_screen") == true
-
+    val currentPageName = currentBackStackEntry?.destination?.route
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -153,7 +156,8 @@ fun MainPage(
                 navController.navigate(Route.FavoriteScreen.title) {
                     launchSingleTop = true
                 }
-            }
+            },
+            currentTab = currentPageName
         ) },
         content = { innerPadding ->
             // Embed the navigation host within the page
@@ -378,7 +382,7 @@ fun ListItemList(
 }
 
 @Composable
-fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () -> Unit, onFavoriteClick: () -> Unit ) {
+fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () -> Unit, onFavoriteClick: () -> Unit, currentTab: String?) {
     BottomAppBar {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -388,8 +392,9 @@ fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () 
                 onClick = onHomeClick,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
+                val icon = if (currentTab == null || currentTab == "main_page" || currentTab.startsWith("persona_screen")) Icons.Filled.Home else Icons.Outlined.Home
                 Icon(
-                    Icons.Filled.Home,
+                    imageVector = icon,
                     contentDescription = "Home",
                     modifier = Modifier.size(32.dp)
                 )
@@ -399,8 +404,9 @@ fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () 
                 onClick = onFavoriteClick,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
+                val icon = if (currentTab == "Favorite Screen") Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
                 Icon(
-                    Icons.Filled.Favorite,
+                    imageVector = icon,
                     contentDescription = "Favorite",
                     modifier = Modifier.size(32.dp)
                 )
@@ -410,8 +416,9 @@ fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () 
                 onClick = onSettingsClick,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
+                val icon = if (currentTab == "Setting Screen") Icons.Filled.Settings else Icons.Outlined.Settings
                 Icon(
-                    Icons.Filled.Settings,
+                    imageVector = icon,
                     contentDescription = "Setting",
                     modifier = Modifier.size(32.dp)
                 )
