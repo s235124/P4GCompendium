@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message Persona {
+  string name = 1;
+  string race = 2;
+  int32 level = 3;
+  string resists = 4;
+  repeated int32 stats = 5;
+  int32 img = 6;
+}
+
+message PersonaFavorites {
+  repeated Persona favorites = 1;
+}

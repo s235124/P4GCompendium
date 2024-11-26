@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import com.example.p4g.MainContent
 import com.example.p4g.Screen.KarakterScreen
 import com.example.p4g.Screen.SettingScreen
-import com.example.p4g.Screen.FavoriteScreen
+import com.example.p4g.Screen.FavoritesScreen
 import com.example.p4g.model.Persona
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -20,7 +20,9 @@ import kotlinx.serialization.json.Json
 fun MainNavHost(
     navController: NavHostController,
     onRouteChanged: (Route) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    favorites: MutableList<Persona>,
+    onSaveFavorites: (List<Persona>) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -47,7 +49,19 @@ fun MainNavHost(
         composable("${Route.PersonaScreen.title}/{pJson}") { backStackEntry ->
             val personaJson = backStackEntry.arguments?.getString("pJson") // Fetch name from arguments
             val persona = personaJson?.let {Json.decodeFromString<Persona>(Uri.decode(it))}
-            KarakterScreen(persona = persona, onNavigateBack = { navController.popBackStack() })
+            KarakterScreen(
+                persona = persona, onNavigateBack = { navController.popBackStack() },
+                onFavoriteClick = { selectedPersona ->
+                    if (selectedPersona != null) {
+                        if (favorites.contains(selectedPersona)) {
+                            favorites.remove(selectedPersona)
+                        } else {
+                            favorites.add(selectedPersona)
+                        }
+                        onSaveFavorites(favorites.toList())
+                    }
+                }
+            )
         }
 
         composable(Route.SettingScreen.title){
@@ -58,7 +72,13 @@ fun MainNavHost(
 
         composable(Route.FavoriteScreen.title){
             onRouteChanged(Route.FavoriteScreen)
-            FavoriteScreen()
+            FavoritesScreen(
+                favorites = favorites,
+                onNavigateToPersona = { persona ->
+                    val personaJson = Uri.encode(Json.encodeToString(persona))
+                    navController.navigate("${Route.PersonaScreen.title}/$personaJson")
+                }
+            )
 
         }
     }

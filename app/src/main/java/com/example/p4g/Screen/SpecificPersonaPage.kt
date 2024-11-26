@@ -15,7 +15,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,25 +40,73 @@ import com.example.p4g.model.Persona
 import com.example.p4g.model.Resistances
 import com.example.p4g.model.Skills
 
-//Kørsel af selve skærmen
 @Composable
-fun KarakterScreen(persona: Persona?, onNavigateBack: () -> Unit) {
-
-    if (persona != null) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp), //luft mellem elementer
-        ) {
-            item { Title(persona.name, persona.img) } //titel øverst
-            item { KarakterBaseInfo(persona.race, persona.level, persona.inherits) } //grundlæggende karakterinfo nedenfor
-            item { StatsSection(persona.stats) }
-            item { ResistanceSection(personaResistanceToResistanceObject(persona.resists)) }
-            item { SkillsSection(persona.skills) }
+fun KarakterScreen(
+    persona: Persona?,
+    onNavigateBack: () -> Unit,
+    onFavoriteClick: (Persona?) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBarWithFavorite(
+                persona = persona,
+                onNavigateBack = onNavigateBack,
+                onFavoriteClick = onFavoriteClick
+            )
+        }
+    ) { innerPadding ->
+        if (persona != null) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item { Title(persona.name, persona.img) }
+                item { KarakterBaseInfo(
+                    persona.race, persona.level,
+                    primaryElement = persona.inherits
+                ) }
+                item { StatsSection(persona.stats) }
+                item { ResistanceSection(personaResistanceToResistanceObject(persona.resists)) }
+            }
         }
     }
 }
+
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarWithFavorite(
+    persona: Persona?,
+    onNavigateBack: () -> Unit,
+    onFavoriteClick: (Persona?) -> Unit
+) {
+    TopAppBar(
+        title = { Text(text = persona?.name ?: "Details") },
+        navigationIcon = {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = { onFavoriteClick(persona) }) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = "Favorite"
+                )
+            }
+        }
+    )
+}
+
 
 @Composable
 fun Title(name : String, img : Int) {

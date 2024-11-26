@@ -50,8 +50,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +71,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.p4g.HTTP.PersonaViewModel
+import com.example.p4g.datastore.getFavorites
+import com.example.p4g.datastore.saveFavorites
 import com.example.p4g.model.ListItem
 import com.example.p4g.model.Persona
 import com.example.p4g.navigation.MainNavHost
@@ -76,6 +80,8 @@ import com.example.p4g.navigation.Route
 import com.example.p4g.ui.theme.P4GTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 const val GOLDEN_COLOR = 0xFFFFe52C
@@ -105,16 +111,30 @@ fun P4GCompendiumApp() {
     )
 }
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
     modifier: Modifier = Modifier,
-    navController: NavHostController, // Pass the NavController
-    onRouteChanged: (Route) -> Unit // Callback to handle route changes
+    navController: NavHostController,
+    onRouteChanged: (Route) -> Unit
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val canNavigateBack = currentBackStackEntry?.destination?.route?.startsWith("persona_screen") == true
+    val favorites = remember { mutableStateListOf<Persona>() }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope() // Coroutine scope for saving favorites
     val currentPageName = currentBackStackEntry?.destination?.route
+
+    // Load favorites from DataStore
+    LaunchedEffect(Unit) {
+        getFavorites(context).collectLatest { savedFavorites ->
+            favorites.clear()
+            favorites.addAll(savedFavorites)
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -143,13 +163,11 @@ fun MainPage(
             onHomeClick = {
                 navController.navigate(Route.MainPage.title) {
                     launchSingleTop = true
-
                 }
             },
             onSettingsClick = {
                 navController.navigate(Route.SettingScreen.title) {
                     launchSingleTop = true
-
                 }
             },
             onFavoriteClick = {
@@ -163,7 +181,14 @@ fun MainPage(
             // Embed the navigation host within the page
             MainNavHost(
                 navController = navController,
+                favorites = favorites,
                 onRouteChanged = onRouteChanged,
+                onSaveFavorites = { updatedFavorites ->
+                    // Launch coroutine to save favorites
+                    coroutineScope.launch {
+                        saveFavorites(context, updatedFavorites)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
@@ -171,6 +196,7 @@ fun MainPage(
         }
     )
 }
+
 
 
 @Composable
