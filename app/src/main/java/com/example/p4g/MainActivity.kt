@@ -314,7 +314,7 @@ fun fetchList(modifier: Modifier): List<Persona> {
                 try {
                     Log.d("ListItemList", "Fetching data...")
                     val pvm = PersonaViewModel()
-                    delay(1000) // Simulate network delay for testing
+                    delay(2000) // Simulate network delay for testing
                     personaList = PersonaJSON.makeList(pvm) // Pass the ViewModel
                     Log.d("ListItemList", "Data fetched: ${personaList.size} items") // Log the size of the list
                 } catch (e: Exception) {
@@ -338,6 +338,21 @@ fun ListItemList(
     isLoading: Boolean,
     onCardClick: (Persona) -> Unit
 ) {
+    val raceOrder = listOf(
+        "Fool", "Magician", "Priestess", "Empress", "Emperor",
+        "Hierophant", "Lovers", "Chariot", "Justice", "Hermit",
+        "Fortune", "Strength", "Hanged", "Death", "Temperance",
+        "Devil", "Tower", "Star", "Moon", "Sun", "Judgement",
+        "Aeon", "Jester", "World"
+    )
+
+    // Sort JSON objects
+    val sortedList = filteredList.sortedWith(
+        compareBy(
+            { raceOrder.indexOf(it.race) }, // Sort by race order
+            { -it.level } // Then by level descending
+        )
+    )
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -346,7 +361,7 @@ fun ListItemList(
         LazyColumn(modifier = modifier) {
             // A bit of an unorthodox way of getting images for cards, but alas, a way
             var i = 1
-            items(filteredList) { listItem ->
+            items(sortedList) { listItem ->
 //                Log.d("ListItemList", "Rendering item: ${listItem.name}")
 
                 val fetchableName = listItem.name
