@@ -125,6 +125,7 @@ fun MainPage(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope() // Coroutine scope for saving favorites
     val currentPageName = currentBackStackEntry?.destination?.route
+    val isPreviousPageFavourite = navController.previousBackStackEntry?.destination?.route == "Favorite Screen"
 
     // Load favorites from DataStore
     LaunchedEffect(Unit) {
@@ -174,7 +175,8 @@ fun MainPage(
                     launchSingleTop = true
                 }
             },
-            currentTab = currentPageName
+            currentTab = currentPageName,
+            isPreviousPageFavourite = isPreviousPageFavourite
         ) },
         content = { innerPadding ->
             // Embed the navigation host within the page
@@ -431,7 +433,7 @@ fun ListItemList(
 }
 
 @Composable
-fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () -> Unit, onFavoriteClick: () -> Unit, currentTab: String?) {
+fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () -> Unit, onFavoriteClick: () -> Unit, currentTab: String?, isPreviousPageFavourite: Boolean) {
     BottomAppBar {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -441,7 +443,7 @@ fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () 
                 onClick = onHomeClick,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                val icon = if (currentTab == null || currentTab == "main_page" || currentTab.startsWith("persona_screen")) Icons.Filled.Home else Icons.Outlined.Home
+                val icon = if (currentTab == null || currentTab == "main_page" || (currentTab.startsWith("persona_screen") && !isPreviousPageFavourite)) Icons.Filled.Home else Icons.Outlined.Home
                 Icon(
                     imageVector = icon,
                     contentDescription = "Home",
@@ -453,12 +455,16 @@ fun BottomBar (modifier: Modifier, onHomeClick: () -> Unit, onSettingsClick: () 
                 onClick = onFavoriteClick,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                val icon = if (currentTab == "Favorite Screen") Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
-                Icon(
-                    imageVector = icon,
-                    contentDescription = "Favorite",
-                    modifier = Modifier.size(32.dp)
-                )
+                if (currentTab != null) {
+                    Log.d("tab", "$isPreviousPageFavourite")
+                    val icon =
+                        if (currentTab == "Favorite Screen" || (currentTab.startsWith("persona_screen") && isPreviousPageFavourite)) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "Favorite",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
