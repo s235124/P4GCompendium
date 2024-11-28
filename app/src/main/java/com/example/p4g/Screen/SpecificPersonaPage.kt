@@ -91,7 +91,6 @@ fun Title(name : String, img : Int, persona: Persona?, onFavoriteClick: (Persona
             horizontalAlignment = Alignment.End
         ){
             IconButton(onClick = { onFavoriteClick(persona) }) {
-                // If it is favourited, filled icon, otherwise outlined icon
                 val icon = if (personaExistsInFavourites) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
                 Icon(imageVector = icon, contentDescription = "Favourite icon")
             }

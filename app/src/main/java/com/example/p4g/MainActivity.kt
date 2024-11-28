@@ -219,7 +219,7 @@ fun MainContent(
 
     // Filtering logic
     val filteredList = personaList.filter {
-        it.name.contains(searchText.text, ignoreCase = true)
+        it.name.startsWith(searchText.text, ignoreCase = true)
     }
 
     Column(modifier = Modifier.padding(10.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {

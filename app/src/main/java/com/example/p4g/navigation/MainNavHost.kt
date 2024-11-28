@@ -2,6 +2,10 @@ package com.example.p4g.navigation
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -46,7 +50,15 @@ fun MainNavHost(
         }
 
         // Persona Details Route
-        composable("${Route.PersonaScreen.title}/{pJson}") { backStackEntry ->
+        composable(
+            "${Route.PersonaScreen.title}/{pJson}",
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn() // Slide in from the right
+            },
+            exitTransition = {
+                slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut() // Slide out to the left
+            }
+        ) { backStackEntry ->
             val personaJson = backStackEntry.arguments?.getString("pJson") // Fetch entire persona from arguments
             val persona = personaJson?.let {Json.decodeFromString<Persona>(Uri.decode(it))}
             var isInFav = false
