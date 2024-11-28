@@ -49,6 +49,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -67,6 +68,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -78,11 +80,8 @@ import com.example.p4g.model.Persona
 import com.example.p4g.navigation.MainNavHost
 import com.example.p4g.navigation.Route
 import com.example.p4g.ui.theme.P4GTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val GOLDEN_COLOR = 0xFFFFe52C
 
@@ -329,32 +328,41 @@ fun ListCard(persona: Persona, modifier: Modifier = Modifier, onClick: (Persona)
 
 }
 
+//@Composable
+//fun fetchList(modifier: Modifier): List<Persona> {
+//    var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
+//    var isLoading by remember { mutableStateOf(true) }
+//
+//    LaunchedEffect(Unit) {
+//        withContext(Dispatchers.IO) {
+//            while (personaList.isEmpty()) {
+//                try {
+//                    Log.d("ListItemList", "Fetching data...")
+//                    val pvm = PersonaViewModel()
+//                    delay(2000) // Simulate network delay for testing
+//                    personaList = PersonaJSON.makeList(pvm) // Pass the ViewModel
+//                    Log.d("ListItemList", "Data fetched: ${personaList.size} items") // Log the size of the list
+//                } catch (e: Exception) {
+//                    Log.e("ListItemList", "Error fetching data: ${e.message}")
+//                } finally {
+//                    isLoading = false // Ensure loading state is updated
+//                }
+//            }
+//        }
+//    }
+//
+//    // Return the fetched list even if it's empty while loading
+//    return personaList
+//}
+
 @Composable
-fun fetchList(modifier: Modifier): List<Persona> {
-    var personaList by remember { mutableStateOf<List<Persona>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
+fun fetchList(modifier: Modifier = Modifier): List<Persona> {
+    val viewModel: PersonaViewModel = viewModel() // Proper ViewModel instantiation
+    val personas by viewModel.personas.collectAsState(initial = null) // Collect StateFlow
 
-    LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
-            while (personaList.isEmpty()) {
-                try {
-                    Log.d("ListItemList", "Fetching data...")
-                    val pvm = PersonaViewModel()
-                    delay(2000) // Simulate network delay for testing
-                    personaList = PersonaJSON.makeList(pvm) // Pass the ViewModel
-                    Log.d("ListItemList", "Data fetched: ${personaList.size} items") // Log the size of the list
-                } catch (e: Exception) {
-                    Log.e("ListItemList", "Error fetching data: ${e.message}")
-                } finally {
-                    isLoading = false // Ensure loading state is updated
-                }
-            }
-        }
-    }
-
-    // Return the fetched list even if it's empty while loading
-    return personaList
+    return PersonaJSON.makeList(personas)
 }
+
 
 @SuppressLint("DiscouragedApi")
 @Composable

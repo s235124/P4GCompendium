@@ -1,38 +1,39 @@
 package com.example.p4g
 
 import android.util.Log
-import com.example.p4g.HTTP.PersonaViewModel
+import com.example.p4g.model.Entity
 import com.example.p4g.model.Persona
 import com.example.p4g.model.Skills
 
 class PersonaJSON {
     companion object {
-        fun makeList(personaViewModel: PersonaViewModel): ArrayList<Persona> {
+        fun makeList(personas: Map<String, Entity>?): ArrayList<Persona> {
             val personaList = arrayListOf<Persona>()
 
-            // Ensure personas are loaded
-            personaViewModel.personas.value?.let { personas ->
+            if (personas != null && personas.isNotEmpty()) {
                 // Iterate through the map
                 personas.forEach { persona ->
                     val p = Persona(
-                        persona.key,
-                        persona.value.inherits.replaceFirstChar { char -> char.titlecaseChar() },
-                        persona.value.lvl,
-                        persona.value.race,
-                        persona.value.resists
+                        name = persona.key,
+                        inherits = persona.value.inherits.replaceFirstChar { char -> char.titlecaseChar() },
+                        level = persona.value.lvl,
+                        race = persona.value.race,
+                        resists = persona.value.resists
                     )
 
-                    for (skill in persona.value.skills) {
+                    // Add skills
+                    persona.value.skills.forEach { skill ->
                         p.skills.add(Skills(skill.key, skill.value))
                     }
 
-                    for (stat in persona.value.stats) {
+                    // Add stats
+                    persona.value.stats.forEach { stat ->
                         p.stats.add(stat)
                     }
 
                     personaList.add(p)
                 }
-            } ?: run {
+            } else {
                 Log.e("PersonaJSON", "No personas available.")
             }
 
@@ -40,3 +41,4 @@ class PersonaJSON {
         }
     }
 }
+
