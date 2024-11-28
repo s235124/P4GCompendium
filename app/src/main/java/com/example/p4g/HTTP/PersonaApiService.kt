@@ -1,6 +1,6 @@
 package com.example.p4g.HTTP
 
-import com.example.p4g.Entity
+import com.example.p4g.model.Entity
 import retrofit2.http.GET
 
 interface PersonaApiService {

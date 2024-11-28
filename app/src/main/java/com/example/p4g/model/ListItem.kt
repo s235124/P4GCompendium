@@ -1,5 +1,5 @@
 
-package com.example.p4g.listItems
+package com.example.p4g.model
 
 import androidx.annotation.DrawableRes
 
@@ -9,3 +9,6 @@ data class ListItem(
     val level : Int,
     val race : String
 )
+{
+    constructor(persona: Persona) : this(name = persona.name, img = persona.img, level = persona.level, race = persona.race)
+}
