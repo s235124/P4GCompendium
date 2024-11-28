@@ -15,6 +15,7 @@ import com.example.p4g.MainContent
 import com.example.p4g.Screen.FavoritesScreen
 import com.example.p4g.Screen.KarakterScreen
 import com.example.p4g.Screen.SettingScreen
+import com.example.p4g.datastore.saveFavorites
 import com.example.p4g.model.Persona
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -95,7 +96,12 @@ fun MainNavHost(
 
         composable(Route.SettingScreen.title){
             onRouteChanged(Route.SettingScreen)
-            SettingScreen()
+            SettingScreen(
+                onClearFavorites = {
+                    favorites.clear() // Clear favorites list
+                    onSaveFavorites( favorites.toList()) // Save the empty list to DataStore
+                }
+            )
 
         }
 
