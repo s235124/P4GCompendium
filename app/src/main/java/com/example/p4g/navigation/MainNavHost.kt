@@ -8,9 +8,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.p4g.MainContent
+import com.example.p4g.Screen.FavoritesScreen
 import com.example.p4g.Screen.KarakterScreen
 import com.example.p4g.Screen.SettingScreen
-import com.example.p4g.Screen.FavoritesScreen
 import com.example.p4g.model.Persona
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -47,20 +47,37 @@ fun MainNavHost(
 
         // Persona Details Route
         composable("${Route.PersonaScreen.title}/{pJson}") { backStackEntry ->
-            val personaJson = backStackEntry.arguments?.getString("pJson") // Fetch name from arguments
+            val personaJson = backStackEntry.arguments?.getString("pJson") // Fetch entire persona from arguments
             val persona = personaJson?.let {Json.decodeFromString<Persona>(Uri.decode(it))}
+            var isInFav = false
+
+            for (favouritePersona in favorites) {
+                if (favouritePersona.name == persona?.name) {
+                    isInFav = true
+                }
+            }
+
             KarakterScreen(
-                persona = persona, onNavigateBack = { navController.popBackStack() },
-                onFavoriteClick = { selectedPersona ->
-                    if (selectedPersona != null) {
-                        if (favorites.contains(selectedPersona)) {
-                            favorites.remove(selectedPersona)
-                        } else {
-                            favorites.add(selectedPersona)
+                persona = persona,
+                onFavoriteClick = {
+                    if (persona != null) {
+                        var i = 0
+                        for (favouritePersona in favorites) {
+                            if (favouritePersona.name == persona.name) {
+                                break
+                            }
+                            i++
+                        }
+                        if (i >= favorites.size) {
+                            favorites.add(persona)
+                        }
+                        else {
+                            favorites.removeAt(i)
                         }
                         onSaveFavorites(favorites.toList())
                     }
-                }
+                },
+                personaExistsInFavourites = isInFav
             )
         }
 
